@@ -188,7 +188,7 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 <div id="homePage">
   <div class="sura-grid-wrap">
     <div class="sura-grid" id="suraGrid"></div>
-    <div class="sura-footer">Таёрлади: Исмоил Дилмурод ўғли</div>
+    <div class="sura-footer">Тайёрлади: Исмоил Дилмурод ўғли</div>
   </div>
 </div>
 <div id="suraPage"></div>
@@ -314,7 +314,7 @@ function openSura(num,hw,scrollVerse){
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
   if(sura.description)html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
   html+='<div>'+vH+'</div>'+khH;
-  html+='<div class="sura-footer">Таёрлади: Исмоил Дилмурод ўғли</div>';
+  html+='<div class="sura-footer">Тайёрлади: Исмоил Дилмурод ўғли</div>';
   document.getElementById('suraPage').innerHTML=html;
   if(scrollVerse){
     setTimeout(function(){var el=document.getElementById('v-'+scrollVerse);if(el)el.scrollIntoView({block:'center',behavior:'smooth'});},80);
