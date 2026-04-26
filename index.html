@@ -49,15 +49,6 @@ header.in-page .logo{display:none}
 .back-btn:active{border-color:var(--gold);color:var(--gold);transform:scale(.97)}
 .back-btn.visible{display:inline-flex}
 #homePage{}
-.home-hero{text-align:center;padding:36px 14px 32px;border-bottom:1px solid var(--border)}
-.bismillah-hero{font-family:'Scheherazade New',serif;font-size:40px;color:var(--gold);margin-bottom:14px;direction:rtl;line-height:1.5}
-.home-title{font-size:24px;color:var(--text);margin-bottom:5px}
-.home-sub{font-size:13px;color:var(--text-dim);margin-bottom:20px}
-.home-stats{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.home-stat{padding:9px 18px;border-right:1px solid var(--border);text-align:center}
-.home-stat:last-child{border-right:none}
-.home-stat-num{font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--gold);display:block}
-.home-stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em}
 .font-control{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface3);margin-bottom:16px}
 .font-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em}
 .font-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
@@ -161,13 +152,8 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 
 
 @media(min-width:800px){.search-wrap{max-width:560px;flex:1 1 auto;}header{gap:16px;}}
-.bismillah-hero{position:relative;padding:18px 0 22px;}
-.bismillah-hero::before,.bismillah-hero::after{content:'';display:block;width:240px;max-width:62%;height:22px;margin:0 auto 22px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-linecap='round'%3E%3Cline x1='6' y1='11' x2='86' y2='11' stroke-width='.7' opacity='.55'/%3E%3Cline x1='154' y1='11' x2='234' y2='11' stroke-width='.7' opacity='.55'/%3E%3Ccircle cx='86' cy='11' r='2' fill='%23c9a84c' opacity='.55'/%3E%3Ccircle cx='154' cy='11' r='2' fill='%23c9a84c' opacity='.55'/%3E%3Cline x1='92' y1='11' x2='108' y2='11' stroke-width='.5' opacity='.4'/%3E%3Cline x1='132' y1='11' x2='148' y2='11' stroke-width='.5' opacity='.4'/%3E%3Cg transform='translate(120 11)' stroke='%23c9a84c' stroke-width='.9'%3E%3Crect x='-9' y='-9' width='18' height='18' opacity='.55'/%3E%3Crect x='-9' y='-9' width='18' height='18' transform='rotate(45)' opacity='.55'/%3E%3Ccircle r='2.4' fill='%23c9a84c' opacity='.45'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;}
-.bismillah-hero::after{margin:22px auto 0;}
-.light .bismillah-hero::before,.light .bismillah-hero::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 22'%3E%3Cg fill='none' stroke='%238b6914' stroke-linecap='round'%3E%3Cline x1='6' y1='11' x2='86' y2='11' stroke-width='.8' opacity='.55'/%3E%3Cline x1='154' y1='11' x2='234' y2='11' stroke-width='.8' opacity='.55'/%3E%3Ccircle cx='86' cy='11' r='2' fill='%238b6914' opacity='.55'/%3E%3Ccircle cx='154' cy='11' r='2' fill='%238b6914' opacity='.55'/%3E%3Cline x1='92' y1='11' x2='108' y2='11' stroke-width='.6' opacity='.4'/%3E%3Cline x1='132' y1='11' x2='148' y2='11' stroke-width='.6' opacity='.4'/%3E%3Cg transform='translate(120 11)' stroke='%238b6914' stroke-width='1'%3E%3Crect x='-9' y='-9' width='18' height='18' opacity='.55'/%3E%3Crect x='-9' y='-9' width='18' height='18' transform='rotate(45)' opacity='.55'/%3E%3Ccircle r='2.4' fill='%238b6914' opacity='.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
 .nav-mid{flex:0 0 auto;color:var(--gold-dark);font-size:18px;opacity:.55;letter-spacing:0;line-height:1;align-self:center;font-family:'Scheherazade New','Geeza Pro','Noto Naskh Arabic',serif;}
 .ornament svg{width:240px;height:22px;}
-.home-stats{box-shadow:0 1px 0 rgba(201,168,76,.06);}
 </style>
 </head>
 <body>
@@ -203,15 +189,6 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 </header>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="homePage">
-  <div class="home-hero">
-    <div class="bismillah-hero">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
-    <h1 class="home-title">Қуръони Карим</h1>
-    <p class="home-sub">Ўзбекча изоҳли таржима</p>
-    <div class="home-stats">
-      <div class="home-stat"><span class="home-stat-num">114</span><span class="home-stat-label">Сура</span></div>
-      <div class="home-stat"><span class="home-stat-num" id="totalV">...</span><span class="home-stat-label">Оят</span></div>
-    </div>
-  </div>
   <div class="sura-grid-wrap">
     <div class="sura-grid" id="suraGrid"></div>
   </div>
@@ -461,7 +438,6 @@ window.addEventListener('scroll',function(){
   }
 });
 
-document.getElementById('totalV').textContent=QD.reduce(function(s,r){return s+r.verseCount;},0).toLocaleString();
 apTh();apFz();apAr();buildGrid('');
 
 document.addEventListener('click',function(e){
