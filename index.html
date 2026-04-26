@@ -216,7 +216,6 @@ for(var qi=0;qi<QD.length;qi++){
 
 var ICN={
   cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
-  sh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
   sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
   moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
   ornament:'<svg viewBox="0 0 240 28" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-linecap="round"><line x1="6" y1="14" x2="86" y2="14" stroke-width=".7"/><line x1="154" y1="14" x2="234" y2="14" stroke-width=".7"/><circle cx="86" cy="14" r="2.2" fill="currentColor"/><circle cx="154" cy="14" r="2.2" fill="currentColor"/><line x1="92" y1="14" x2="108" y2="14" stroke-width=".5" opacity=".55"/><line x1="132" y1="14" x2="148" y2="14" stroke-width=".5" opacity=".55"/></g><g transform="translate(120 14)" fill="none" stroke="currentColor" stroke-width=".9"><rect x="-9" y="-9" width="18" height="18"/><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)"/><circle r="2.4" fill="currentColor"/></g></svg>'
@@ -292,7 +291,6 @@ function openSura(num,hw,scrollVerse){
     }
     vH+='<div class="verse-actions">';
     vH+='<button class="verse-action-btn" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха">'+ICN.cp+'<span>Нусха</span></button>';
-    vH+='<button class="verse-action-btn" onclick="App.shr('+num+',\''+lbl+'\')" aria-label="Улашиш">'+ICN.sh+'<span>Улашиш</span></button>';
     vH+='</div>';
     vH+='</div></div>';
   }
@@ -459,7 +457,6 @@ return{
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
   cp:function(n,lbl){var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
-  shr:function(n,lbl){var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';if(navigator.share)navigator.share({title:s.name+' '+lbl,text:t}).catch(function(){});else copyText(t).then(function(){toast('Нусха олинди');});},
   doSearch:doSearch
 };
 })();
