@@ -2,11 +2,12 @@
 
 ## Project
 
-Single-page Quran reader (Uzbek translation + Arabic text). Vanilla HTML/CSS/JS, no build step. Three files:
+Single-page Quran reader (Uzbek translation + Arabic text). Vanilla HTML/CSS/JS, no build step. Two files:
 
-- `index.html` — UI shell, all CSS, all app JS.
-- `data.js` — `var QD = [...]` (114 sūras, each verse with `text`/`ar`/`label`/`nums`) and `var KH = "..."` (translator's khatima). Heavy (~4.3 MB) but cached by the Service Worker after first load.
-- `sw.js` — cache-first Service Worker.
+- `index.html` — UI shell, all CSS, all app JS. On load it actively unregisters any previously-registered service worker and clears its caches (the project used to ship a cache-first SW that caused stale-update headaches).
+- `data.js` — `var QD = [...]` (114 sūras, each verse with `text`/`ar`/`label`/`nums`) and `var KH = "..."` (translator's khatima). Heavy (~4.3 MB) but the browser HTTP cache handles it.
+
+`sw.js` still exists at the repo root but only as a **kill-switch**: install + activate clear all caches and unregister the registration. It exists solely so that existing users with a registered SW eventually stop being served stale content. Do not re-introduce a real service worker without an explicit ask.
 
 Served via GitHub Pages from `main` at https://abuyahyo.github.io/quron/.
 
