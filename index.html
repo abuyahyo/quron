@@ -108,6 +108,7 @@ header.in-page .logo{display:none}
 .khatima-body::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent)}
 .khatima-amin{font-size:19px;font-style:normal;font-weight:600;color:var(--gold);display:block;margin-top:12px;margin-bottom:4px}
 .khatima-author{font-family:'IBM Plex Mono',monospace;font-size:11px;font-style:normal;color:var(--text-muted);letter-spacing:.15em;text-transform:uppercase;display:block;margin-top:5px}
+.sura-footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--border);text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase}
 #searchPage{display:none;max-width:720px;margin:0 auto;padding:24px 14px 100px;opacity:0;transition:opacity .3s ease;}
 #searchPage.visible{display:block;opacity:1;}
 body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar{display:none}
@@ -310,6 +311,7 @@ function openSura(num,hw,scrollVerse){
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
   if(sura.description)html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
   html+='<div>'+vH+'</div>'+khH;
+  html+='<div class="sura-footer">Таёрлади: Исмоил Дилмурод ўғли</div>';
   document.getElementById('suraPage').innerHTML=html;
   if(scrollVerse){
     setTimeout(function(){var el=document.getElementById('v-'+scrollVerse);if(el)el.scrollIntoView({block:'center',behavior:'smooth'});},80);
