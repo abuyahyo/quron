@@ -204,7 +204,7 @@ var _s={};
 function sg(k,d){try{var v=localStorage.getItem(k);return v!==null?v:d;}catch(e){return _s[k]!==undefined?_s[k]:d;}}
 function ss(k,v){try{localStorage.setItem(k,v);}catch(e){_s[k]=v;}}
 var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
-var showAr=sg('ar','1')==='1';
+var showAr=sg('ar','0')==='1';
 var sh=[];try{sh=JSON.parse(sg('sh','[]'));}catch(e){sh=[];}
 var navLock=false;
 
