@@ -69,16 +69,14 @@ header.in-page .logo{display:none}
 .nav-btn:active{border-color:var(--gold-dark);color:var(--gold)}
 .nav-btn.disabled{opacity:.3;pointer-events:none}
 .sura-pg-header{text-align:center;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border);position:relative}
-.sura-pg-header::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:60px;height:2px;background:var(--gold-dark)}
 .sura-pg-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .sura-pg-title-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;font-size:38px;color:var(--gold);direction:rtl;line-height:1.4;margin-bottom:8px}
 .sura-pg-title{font-size:24px;color:var(--text);font-style:italic;margin-bottom:4px}
 .sura-pg-title-tr{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px}
 .sura-pg-meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 .meta-pill{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:10px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace}
-.meta-pill .dot{width:4px;height:4px;border-radius:50%;background:var(--gold-dark)}
 .sura-pg-bismillah{text-align:center;font-family:'Scheherazade New',serif;font-size:26px;color:var(--gold-light);padding:18px 0;margin-bottom:14px;direction:rtl}
-.sura-pg-desc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold-dark);border-radius:0 8px 8px 0;padding:13px 16px;margin-bottom:24px;font-size:13px;line-height:1.8;color:var(--text-dim);font-style:italic}
+.sura-pg-desc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-bottom:24px;font-size:13px;line-height:1.8;color:var(--text-dim);font-style:italic}
 .reading-progress{position:fixed;top:58px;left:0;right:0;height:2px;z-index:99}
 .reading-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));width:0%;transition:width .1s}
 .verse{display:grid;grid-template-columns:42px 1fr;gap:11px;align-items:start;padding:14px 8px;border-radius:6px;margin:0 -8px 2px;border-bottom:1px solid var(--border)}
@@ -126,34 +124,25 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 .scroll-top.visible{display:flex}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--gold-dark);color:var(--gold);font-size:12px;padding:8px 18px;border-radius:24px;box-shadow:0 4px 18px rgba(0,0,0,.35);z-index:300;opacity:0;transition:opacity .2s;pointer-events:none;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
 .toast.show{opacity:1}
-.ornament{display:flex;align-items:center;justify-content:center;margin:24px 0 14px;color:var(--gold-dark);opacity:.6}
-.ornament svg{width:140px;height:18px}
 .juz-marker{display:flex;align-items:center;gap:10px;margin:18px -8px 8px;color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
 .juz-marker::before,.juz-marker::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent);opacity:.4}
 /* ── СУРА КАРТОЧКА ── */
 .sura-card{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .2s,background .2s,transform .15s;animation:fadeInUp 0.35s ease both;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative;display:flex;align-items:stretch;text-decoration:none;color:inherit;}
 .sura-card.hidden{display:none}
 .sura-card:active,.sura-card:hover{border-color:var(--gold-dark);background:var(--surface2);transform:scale(0.99);}
-.card-num-block{display:flex;align-items:center;justify-content:center;min-width:54px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='1.2' opacity='.32'%3E%3Crect x='24' y='24' width='52' height='52'/%3E%3Crect x='24' y='24' width='52' height='52' transform='rotate(45 50 50)'/%3E%3C/g%3E%3C/svg%3E") center/74% no-repeat,rgba(0,0,0,0.22);border-right:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--gold);font-weight:600;flex-shrink:0;letter-spacing:.04em;}
-.light .card-num-block{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%238b6914' stroke-width='1.3' opacity='.45'%3E%3Crect x='24' y='24' width='52' height='52'/%3E%3Crect x='24' y='24' width='52' height='52' transform='rotate(45 50 50)'/%3E%3C/g%3E%3C/svg%3E") center/74% no-repeat,rgba(0,0,0,0.05);color:var(--gold-dark);}
+.card-num-block{display:flex;align-items:center;justify-content:center;min-width:48px;border-right:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text-muted);font-weight:500;flex-shrink:0;letter-spacing:.04em;}
 .card-inner{flex:1;padding:11px 12px;display:flex;align-items:center;gap:10px;min-width:0;}
 .card-names{flex:1;min-width:0;}
 .card-name-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:20px;color:var(--gold);line-height:1.4;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-name{font-size:14px;color:var(--text);font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-name-tr{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
-.card-type-badge{font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:11px;border:1px solid;}
-.badge-makki{color:#dba85e;border-color:rgba(219,168,94,0.45);background:rgba(219,168,94,0.13);}
-.badge-madani{color:#65b89c;border-color:rgba(101,184,156,0.45);background:rgba(101,184,156,0.13);}
-.light .badge-makki{color:#8a5814;border-color:rgba(138,88,20,0.55);background:rgba(219,168,94,0.22);}
-.light .badge-madani{color:#1f6b4d;border-color:rgba(31,107,77,0.55);background:rgba(101,184,156,0.22);}
+.card-type-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);}
 .card-verses{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);}
 .card-arrow{color:var(--gold-dark);font-size:14px;}
 
 
 @media(min-width:800px){.search-wrap{max-width:560px;flex:1 1 auto;}header{gap:16px;}}
-.nav-mid{flex:0 0 auto;color:var(--gold-dark);font-size:18px;opacity:.55;letter-spacing:0;line-height:1;align-self:center;font-family:'Scheherazade New','Geeza Pro','Noto Naskh Arabic',serif;}
-.ornament svg{width:240px;height:22px;}
 </style>
 </head>
 <body>
@@ -217,10 +206,8 @@ for(var qi=0;qi<QD.length;qi++){
 var ICN={
   cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
   sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
-  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
-  ornament:'<svg viewBox="0 0 240 28" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="currentColor" stroke-linecap="round"><line x1="6" y1="14" x2="86" y2="14" stroke-width=".7"/><line x1="154" y1="14" x2="234" y2="14" stroke-width=".7"/><circle cx="86" cy="14" r="2.2" fill="currentColor"/><circle cx="154" cy="14" r="2.2" fill="currentColor"/><line x1="92" y1="14" x2="108" y2="14" stroke-width=".5" opacity=".55"/><line x1="132" y1="14" x2="148" y2="14" stroke-width=".5" opacity=".55"/></g><g transform="translate(120 14)" fill="none" stroke="currentColor" stroke-width=".9"><rect x="-9" y="-9" width="18" height="18"/><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)"/><circle r="2.4" fill="currentColor"/></g></svg>'
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
 };
-function ornament(){return '<div class="ornament" aria-hidden="true">'+ICN.ornament+'</div>';}
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function hl(t,q){
@@ -298,7 +285,6 @@ function openSura(num,hw,scrollVerse){
   var next=num<114?gS(num+1):null;
   var navH='<div class="sura-nav">';
   navH+='<button class="nav-btn'+(prev?'':' disabled')+'"'+(prev?' onclick="App.open('+prev.number+')"':'')+'>← <span>'+(prev?esc(prev.name):'—')+'</span></button>';
-  navH+='<span class="nav-mid" aria-hidden="true">۞</span>';
   navH+='<button class="nav-btn'+(next?'':' disabled')+'" style="justify-content:flex-end"'+(next?' onclick="App.open('+next.number+')"':'')+'><span>'+(next?esc(next.name):'—')+'</span> →</button>';
   navH+='</div>';
   var khH='';
@@ -314,11 +300,11 @@ function openSura(num,hw,scrollVerse){
   if(sura.nameAr)html+='<div class="sura-pg-title-ar" dir="rtl" lang="ar">'+esc(sura.nameAr)+'</div>';
   html+='<h2 class="sura-pg-title">«'+esc(sura.name)+'»</h2>';
   if(sura.nameTr)html+='<div class="sura-pg-title-tr">'+esc(sura.nameTr)+'</div>';
-  html+='<div class="sura-pg-meta"><span class="meta-pill"><span class="dot"></span>'+sura.verseCount+' оят</span></div>';
+  html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span></div>';
   html+='</div>';
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
   if(sura.description)html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
-  html+='<div>'+vH+'</div>'+ornament()+khH;
+  html+='<div>'+vH+'</div>'+khH;
   document.getElementById('suraPage').innerHTML=html;
   if(scrollVerse){
     setTimeout(function(){var el=document.getElementById('v-'+scrollVerse);if(el)el.scrollIntoView({block:'center',behavior:'smooth'});},80);
