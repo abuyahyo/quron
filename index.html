@@ -378,7 +378,7 @@ function doSearch(q){
       var lim=Math.min(vr.length,200);
       for(var i=0;i<lim;i++){
         var r=vr[i];
-        h+='<div class="result-item" onclick="App.open('+r.s.number+',\''+esc(q)+'\')">';
+        h+='<div class="result-item" onclick="App.open('+r.s.number+',\''+esc(q)+'\',\''+esc(r.v.label)+'\')">';
         h+='<div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-\u043e\u044f\u0442</div>';
         if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+esc(r.v.ar.substring(0,260))+'</div>';
         h+='<div class="result-text">'+hl(r.v.text.substring(0,260),q)+'</div></div>';
