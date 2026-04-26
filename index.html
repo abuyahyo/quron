@@ -23,6 +23,7 @@
 body{background:var(--bg);color:var(--text);font-family:'Georgia','Playfair Display',serif;min-height:100vh;transition:background .3s,color .3s}
 header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;transition:background .3s}
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
+header.in-page .logo{display:none}
 .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .logo-text{font-size:13px;font-weight:600;color:var(--gold);line-height:1.2}
 .logo-sub{font-size:9px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
@@ -34,9 +35,12 @@ header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-fi
 .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .icon-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;-webkit-tap-highlight-color:transparent}
 .icon-btn:active{border-color:var(--gold-dark);color:var(--gold)}
-.back-btn{display:none;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
-.back-btn:active{border-color:var(--gold-dark);color:var(--gold)}
-.back-btn.visible{display:flex}
+.back-btn{display:none;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Playfair Display',Georgia,serif;font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:border-color .2s,color .2s,background .2s,transform .15s}
+.back-btn .arrow{color:var(--gold);font-size:15px;line-height:1;font-family:Georgia,serif;transition:transform .2s}
+.back-btn:hover{border-color:var(--gold-dark);background:var(--surface2)}
+.back-btn:hover .arrow{transform:translateX(-3px)}
+.back-btn:active{border-color:var(--gold);color:var(--gold);transform:scale(.97)}
+.back-btn.visible{display:inline-flex}
 #homePage{}
 .home-hero{text-align:center;padding:36px 14px 32px;border-bottom:1px solid var(--border)}
 .bismillah-hero{font-family:'Scheherazade New',serif;font-size:40px;color:var(--gold);margin-bottom:14px;direction:rtl;line-height:1.5}
@@ -132,7 +136,7 @@ header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-fi
   <div class="logo" onclick="App.goHome()" role="button" tabindex="0" aria-label="Бош саҳифага қайтиш">
     <div><div class="logo-text">Қуръони Карим</div><div class="logo-sub">Ўзбекча таржима</div></div>
   </div>
-  <button class="back-btn" id="backBtn" onclick="App.goHome()" aria-label="Бош саҳифага қайтиш">← Бош саҳифа</button>
+  <button class="back-btn" id="backBtn" onclick="App.goHome()" aria-label="Бош саҳифага қайтиш"><span class="arrow" aria-hidden="true">←</span><span>Бош саҳифа</span></button>
   <div class="search-wrap" role="search">
     <input type="search" class="search-input" id="searchInput" placeholder="Қидириш..." autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
     <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -333,6 +337,7 @@ function showPanel(p){
   document.getElementById('suraPage').className=p==='sura'?'visible':'';
   document.getElementById('searchPage').className=p==='search'?'visible':'';
   document.getElementById('backBtn').className='back-btn'+(p!=='home'?' visible':'');
+  document.querySelector('header').classList.toggle('in-page',p!=='home');
   document.getElementById('progressBar').style.width='0%';
 }
 
