@@ -88,18 +88,15 @@ header.in-page .logo{display:none}
 .verse-num.combined{background:rgba(139,105,20,.1);border-color:var(--gold-dark);color:var(--gold)}
 .verse-num:hover{border-color:var(--gold)}
 .verse-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:26px;line-height:2.05;color:var(--text);margin-bottom:10px;font-weight:400}
+.verse-side{display:flex;flex-direction:column;align-items:center;gap:8px}
+.verse-cp-btn{background:transparent;border:1px solid var(--border);color:var(--text-muted);width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0;transition:color .15s,border-color .15s}
+.verse-cp-btn:hover,.verse-cp-btn:active{color:var(--gold);border-color:var(--gold-dark)}
+.verse-cp-btn svg{width:13px;height:13px}
 .verse-text{line-height:1.95;color:var(--text)}
 .verse-text mark{background:rgba(201,168,76,.25);color:var(--gold-light);border-radius:2px;padding:0 2px}
 .verse-izoh{margin-top:7px;padding:7px 11px;background:var(--izoh-bg);border-left:2px solid var(--izoh-border);border-radius:0 5px 5px 0;font-size:12px;line-height:1.7;color:var(--izoh);font-style:italic;display:none}
 .verse-izoh.show{display:block}
 .izoh-toggle{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--izoh-border);cursor:pointer;margin-top:5px;display:inline-block;opacity:.75;text-transform:uppercase;letter-spacing:.05em;-webkit-tap-highlight-color:transparent;background:transparent;border:0;padding:0}
-.verse-actions{display:flex;gap:2px;margin-top:9px;opacity:.55;transition:opacity .2s;flex-wrap:wrap}
-.verse:hover .verse-actions,.verse.highlighted .verse-actions{opacity:1}
-@media(hover:none){.verse-actions{opacity:.85}}
-.verse-action-btn{background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:10px;padding:5px 8px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em;-webkit-tap-highlight-color:transparent;transition:color .15s,background .15s,border-color .15s}
-.verse-action-btn:hover{color:var(--gold);background:var(--surface2);border-color:var(--border)}
-.verse-action-btn.active{color:var(--gold);border-color:var(--gold-dark)}
-.verse-action-btn svg{width:13px;height:13px}
 .khatima{margin-top:44px;padding-top:32px;border-top:1px solid var(--border);text-align:center}
 .khatima-stars{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;color:var(--gold-dark);font-size:16px;letter-spacing:6px}
 .khatima-stars::before,.khatima-stars::after{content:'';flex:1;max-width:80px;height:1px;background:var(--border)}
@@ -268,7 +265,10 @@ function openSura(num,hw,scrollVerse){
     var hilit=(hw&&v.text.toLowerCase().indexOf(hw.toLowerCase())>=0)||(scrollVerse&&v.label===scrollVerse);
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
+    vH+='<div class="verse-side">';
     vH+='<div class="verse-num'+(comb?' combined':'')+'">'+lbl+'</div>';
+    vH+='<button class="verse-cp-btn" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха">'+ICN.cp+'</button>';
+    vH+='</div>';
     vH+='<div class="verse-content">';
     if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar">'+esc(v.ar)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
@@ -276,9 +276,6 @@ function openSura(num,hw,scrollVerse){
       vH+='<span class="izoh-toggle" onclick="App.iz(this)">▼ Изоҳни кўриш</span>';
       vH+='<div class="verse-izoh">'+esc(p.iz)+'</div>';
     }
-    vH+='<div class="verse-actions">';
-    vH+='<button class="verse-action-btn" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха">'+ICN.cp+'<span>Нусха</span></button>';
-    vH+='</div>';
     vH+='</div></div>';
   }
   var prev=num>1?gS(num-1):null;
