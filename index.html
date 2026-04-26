@@ -37,11 +37,11 @@ header.in-page .logo{display:none}
 .icon-btn:hover,.icon-btn:active{border-color:var(--gold-dark);color:var(--gold)}
 .icon-btn.active{border-color:var(--gold-dark);color:var(--gold)}
 .icon-btn svg{width:15px;height:15px}
-.popover{position:absolute;top:46px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:200;display:none;flex-direction:column;gap:12px;min-width:220px}
+.popover{position:absolute;top:46px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 10px 32px rgba(0,0,0,.4);z-index:200;display:none;flex-direction:column;gap:14px;min-width:240px}
 .light .popover{box-shadow:0 8px 32px rgba(0,0,0,.12)}
 .popover.show{display:flex}
-.popover-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.popover-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em}
+.popover-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.popover-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.12em}
 .back-btn{display:none;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'Playfair Display',Georgia,serif;font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:border-color .2s,color .2s,background .2s,transform .15s}
 .back-btn .arrow{color:var(--gold);font-size:15px;line-height:1;font-family:Georgia,serif;transition:transform .2s}
 .back-btn:hover{border-color:var(--gold-dark);background:var(--surface2)}
@@ -49,13 +49,14 @@ header.in-page .logo{display:none}
 .back-btn:active{border-color:var(--gold);color:var(--gold);transform:scale(.97)}
 .back-btn.visible{display:inline-flex}
 #homePage{}
-.font-control{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface3);margin-bottom:16px}
-.font-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em}
-.font-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0}
-.font-btn svg{width:14px;height:14px}
-.font-btn:hover{border-color:var(--gold-dark);color:var(--gold)}
-.font-btn:active{border-color:var(--gold-dark);color:var(--gold)}
-.font-size-display{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);min-width:26px;text-align:center}
+.fs-stepper{display:inline-flex;align-items:stretch;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;height:30px}
+.fs-btn{background:transparent;border:0;color:var(--text-dim);width:30px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0;font-family:inherit;transition:color .15s,background .15s}
+.fs-btn:hover,.fs-btn:active{color:var(--gold);background:var(--surface3)}
+.fs-display{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);min-width:34px;text-align:center;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--border);border-right:1px solid var(--border);padding:0 6px}
+.ar-toggle{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:38px;height:30px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0;transition:color .15s,border-color .15s,background .15s}
+.ar-toggle svg{width:15px;height:15px}
+.ar-toggle:hover{border-color:var(--gold-dark);color:var(--gold)}
+.ar-toggle.on{color:var(--gold);border-color:var(--gold-dark);background:var(--surface3)}
 .sura-grid-wrap{padding:24px 12px 80px;max-width:1400px;margin:0 auto}
 .grid-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .grid-title{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--text-muted)}
@@ -163,14 +164,17 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
     </button>
     <div class="popover" id="settingsPop" role="dialog" aria-label="Созламалар">
-      <div class="popover-row"><span class="popover-label">Шрифт ўлчами</span></div>
-      <div class="popover-row" style="justify-content:center">
-        <button class="font-btn" type="button" onclick="App.fz(-1)" aria-label="Кичиклаштириш">−</button>
-        <span class="font-size-display" id="fzDisplay">16px</span>
-        <button class="font-btn" type="button" onclick="App.fz(1)" aria-label="Катталаштириш">+</button>
+      <div class="popover-row">
+        <span class="popover-label">Шрифт</span>
+        <div class="fs-stepper" role="group" aria-label="Шрифт ўлчами">
+          <button class="fs-btn" type="button" onclick="App.fz(-1)" aria-label="Кичиклаштириш">−</button>
+          <span class="fs-display" id="fzDisplay">16</span>
+          <button class="fs-btn" type="button" onclick="App.fz(1)" aria-label="Катталаштириш">+</button>
+        </div>
       </div>
-      <div class="popover-row"><span class="popover-label">Араб матни</span>
-        <button class="font-btn" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
+      <div class="popover-row">
+        <span class="popover-label">Араб матни</span>
+        <button class="ar-toggle" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
       </div>
     </div>
   </div>
@@ -219,11 +223,11 @@ function hl(t,q){
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
 function apTh(){document.body.classList.toggle('light',th==='light');var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=(th==='light'?ICN.moon:ICN.sun);}
-function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b){b.innerHTML=showAr?ICN.eyeOff:ICN.eye;b.title=showAr?'Араб матнини яшириш':'Араб матнини кўрсатиш';}}
+function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b){b.innerHTML=showAr?ICN.eyeOff:ICN.eye;b.title=showAr?'Араб матнини яшириш':'Араб матнини кўрсатиш';b.classList.toggle('on',showAr);}}
 function toast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show';clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast';},1800);}
 function copyText(t){if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);return Promise.resolve();}catch(e){return Promise.reject(e);}}
 function suraLink(n){return location.origin+location.pathname+'#/'+n;}
-function apFz(){var els=document.querySelectorAll('.verse-text');for(var i=0;i<els.length;i++)els[i].style.fontSize=fz+'px';var d=document.getElementById('fzDisplay');if(d)d.textContent=fz+'px';}
+function apFz(){var els=document.querySelectorAll('.verse-text');for(var i=0;i<els.length;i++)els[i].style.fontSize=fz+'px';var d=document.getElementById('fzDisplay');if(d)d.textContent=fz;}
 
 var SURA_TYPE=['M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','D','M','D','M','D','M','M','D','D','D','M','M','M','M','M','D','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','D','M','D','M','D','D','M'];
 
