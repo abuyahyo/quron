@@ -101,13 +101,6 @@ header.in-page .logo{display:none}
 .verse-izoh{margin-top:7px;padding:7px 11px;background:var(--izoh-bg);border-left:2px solid var(--izoh-border);border-radius:0 5px 5px 0;font-size:12px;line-height:1.7;color:var(--izoh);font-style:italic;display:none}
 .verse-izoh.show{display:block}
 .izoh-toggle{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--izoh-border);cursor:pointer;margin-top:5px;display:inline-block;opacity:.75;text-transform:uppercase;letter-spacing:.05em;-webkit-tap-highlight-color:transparent;background:transparent;border:0;padding:0}
-.khatima{margin-top:44px;padding-top:32px;border-top:1px solid var(--border);text-align:center}
-.khatima-stars{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;color:var(--gold-dark);font-size:16px;letter-spacing:6px}
-.khatima-stars::before,.khatima-stars::after{content:'';flex:1;max-width:80px;height:1px;background:var(--border)}
-.khatima-body{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 18px;font-size:13px;line-height:2;color:var(--text-dim);font-style:italic;position:relative}
-.khatima-body::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent)}
-.khatima-amin{font-size:19px;font-style:normal;font-weight:600;color:var(--gold);display:block;margin-top:12px;margin-bottom:4px}
-.khatima-author{font-family:'IBM Plex Mono',monospace;font-size:11px;font-style:normal;color:var(--text-muted);letter-spacing:.15em;text-transform:uppercase;display:block;margin-top:5px}
 .sura-footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--border);text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase}
 #searchPage{display:none;max-width:720px;margin:0 auto;padding:24px 14px 100px;opacity:0;transition:opacity .3s ease;}
 #searchPage.visible{display:block;opacity:1;}
@@ -304,13 +297,6 @@ function openSura(num,hw,scrollVerse){
   navH+='<button class="nav-btn'+(prev?'':' disabled')+'"'+(prev?' onclick="App.open('+prev.number+')"':'')+'>← <span>'+(prev?esc(prev.name):'—')+'</span></button>';
   navH+='<button class="nav-btn'+(next?'':' disabled')+'" style="justify-content:flex-end"'+(next?' onclick="App.open('+next.number+')"':'')+'><span>'+(next?esc(next.name):'—')+'</span> →</button>';
   navH+='</div>';
-  var khH='';
-  if(num===114){
-    khH='<div class="khatima"><div class="khatima-stars">✦ ✦ ✦</div>';
-    khH+='<div class="khatima-body">'+esc(KH.replace('Омийн!','').replace('Алоуддин МАНСУР','').trim());
-    khH+='<span class="khatima-amin">Омийн!</span>';
-    khH+='<span class="khatima-author">Алоуддин Мансур</span></div></div>';
-  }
   var html=navH;
   html+='<div class="sura-pg-header">';
   html+='<div class="sura-pg-num">СУРА '+num+'</div>';
@@ -320,7 +306,7 @@ function openSura(num,hw,scrollVerse){
   html+='</div>';
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
   if(sura.description)html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
-  html+='<div>'+vH+'</div>'+khH;
+  html+='<div>'+vH+'</div>';
   html+='<div class="sura-footer">Тайёрлади: Исмоил Дилмурод ўғли</div>';
   document.getElementById('suraPage').innerHTML=html;
   if(scrollVerse){
