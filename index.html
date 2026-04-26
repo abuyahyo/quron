@@ -51,7 +51,9 @@ header.in-page .logo{display:none}
 #homePage{}
 .font-control{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface3);margin-bottom:16px}
 .font-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em}
-.font-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.font-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0}
+.font-btn svg{width:14px;height:14px}
+.font-btn:hover{border-color:var(--gold-dark);color:var(--gold)}
 .font-btn:active{border-color:var(--gold-dark);color:var(--gold)}
 .font-size-display{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);min-width:26px;text-align:center}
 .sura-grid-wrap{padding:24px 12px 80px;max-width:1400px;margin:0 auto}
@@ -168,7 +170,7 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
         <button class="font-btn" type="button" onclick="App.fz(1)" aria-label="Катталаштириш">+</button>
       </div>
       <div class="popover-row"><span class="popover-label">Араб матни</span>
-        <button class="font-btn" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матни">КЎРС.</button>
+        <button class="font-btn" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
       </div>
     </div>
   </div>
@@ -203,7 +205,9 @@ for(var qi=0;qi<QD.length;qi++){
 var ICN={
   cp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
   sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>',
-  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+  eyeOff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>'
 };
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -215,7 +219,7 @@ function hl(t,q){
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
 function apTh(){document.body.classList.toggle('light',th==='light');var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=(th==='light'?ICN.moon:ICN.sun);}
-function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b)b.textContent=showAr?'ЯШИР':'КЎРС.';}
+function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b){b.innerHTML=showAr?ICN.eyeOff:ICN.eye;b.title=showAr?'Араб матнини яшириш':'Араб матнини кўрсатиш';}}
 function toast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show';clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast';},1800);}
 function copyText(t){if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);return Promise.resolve();}catch(e){return Promise.reject(e);}}
 function suraLink(n){return location.origin+location.pathname+'#/'+n;}
