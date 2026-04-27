@@ -95,7 +95,6 @@ header.in-page .logo{display:none}
 .verse.highlighted{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15)}
 .verse-content{min-width:0}
 .verse-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gold-dark);min-width:32px;min-height:24px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9px;flex-shrink:0;padding:2px 4px;margin-top:3px;text-align:center;line-height:1.3;background:transparent;cursor:pointer}
-.verse-num.combined{background:rgba(139,105,20,.1);border-color:var(--gold-dark);color:var(--gold)}
 .verse-num:hover{border-color:var(--gold)}
 .verse-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:26px;line-height:2.05;color:var(--text);margin-bottom:10px;font-weight:400}
 .verse-side{display:flex;flex-direction:column;align-items:center;gap:8px}
@@ -280,12 +279,11 @@ function openSura(num,hw,scrollVerse){
   for(var j=0;j<sura.verses.length;j++){
     var v=sura.verses[j];
     var p=pV(v.text);
-    var comb=v.nums&&v.nums.length>1;
     var hilit=(hw&&v.text.toLowerCase().indexOf(hw.toLowerCase())>=0)||(scrollVerse&&v.label===scrollVerse);
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
     vH+='<div class="verse-side">';
-    vH+='<div class="verse-num'+(comb?' combined':'')+'">'+lbl+'</div>';
+    vH+='<div class="verse-num">'+lbl+'</div>';
     vH+='<button class="verse-cp-btn" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха">'+ICN.cp+'</button>';
     vH+='</div>';
     vH+='<div class="verse-content">';
