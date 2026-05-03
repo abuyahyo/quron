@@ -86,7 +86,11 @@ header.in-page .logo{display:none}
 .sura-pg-meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 .meta-pill{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-size:10px;color:var(--text-dim);font-family:'IBM Plex Mono',monospace}
 .sura-pg-bismillah{text-align:center;font-family:'Scheherazade New',serif;font-size:26px;color:var(--gold-light);padding:18px 0;margin-bottom:14px;direction:rtl}
-.sura-pg-desc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-bottom:24px;font-size:13px;line-height:1.8;color:var(--text-dim);font-style:italic}
+.sura-pg-desc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-top:8px;margin-bottom:24px;font-size:13px;line-height:1.8;color:var(--text-dim);font-style:italic;display:none}
+.sura-pg-desc.show{display:block}
+.desc-toggle{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--surface);border:1px solid var(--border);color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:9px 14px;border-radius:8px;cursor:pointer;margin-bottom:24px;-webkit-tap-highlight-color:transparent;transition:border-color .2s,color .2s,background .2s}
+.desc-toggle:hover,.desc-toggle:active{border-color:var(--gold-dark);color:var(--gold);background:var(--surface2)}
+.desc-toggle.open{margin-bottom:0}
 .reading-progress{position:fixed;top:58px;left:0;right:0;height:2px;z-index:99}
 .reading-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));width:0%;transition:width .1s}
 .verse{display:grid;grid-template-columns:42px 1fr;gap:11px;align-items:start;padding:14px 8px;border-radius:6px;margin:0 -8px 2px;border-bottom:1px solid var(--border)}
@@ -312,7 +316,10 @@ function openSura(num,hw,scrollVerse){
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span></div>';
   html+='</div>';
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
-  if(sura.description)html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
+  if(sura.description){
+    html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false"><span>▼ Тавсифни ўқиш</span></button>';
+    html+='<div class="sura-pg-desc">'+esc(sura.description)+'</div>';
+  }
   html+='<div>'+vH+'</div>';
   html+='<div class="sura-footer">Тайёрлади: Исмоил Дилмурод ўғли</div>';
   document.getElementById('suraPage').innerHTML=html;
@@ -456,6 +463,7 @@ return{
   toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
+  dsc:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.classList.toggle('open',s);btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
   cp:function(n,lbl){var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   doSearch:doSearch
