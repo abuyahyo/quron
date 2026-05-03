@@ -32,6 +32,8 @@ header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-fi
 .header-inner{max-width:1100px;width:100%;margin:0 auto;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px}
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
 header.in-page .logo{display:none}
+body.in-sura header{display:none}
+body.in-sura .reading-progress{top:0}
 .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .logo-text{font-size:13px;font-weight:600;color:var(--gold);line-height:1.2}
 .logo-sub{font-size:9px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
@@ -410,6 +412,7 @@ function showPanel(p){
   document.getElementById('searchPage').className=p==='search'?'visible':'';
   document.getElementById('backBtn').className='back-btn'+(p==='search'?' visible':'');
   document.querySelector('header').classList.toggle('in-page',p!=='home');
+  document.body.classList.toggle('in-sura',p==='sura');
   document.getElementById('progressBar').style.width='0%';
   var fb=document.getElementById('floatBar');
   if(fb)fb.classList.toggle('visible',p==='sura');
