@@ -45,7 +45,7 @@ header.in-page .logo{display:none}
 .icon-btn:hover,.icon-btn:active{border-color:var(--gold-dark);color:var(--gold)}
 .icon-btn.active{border-color:var(--gold-dark);color:var(--gold)}
 .icon-btn svg{width:15px;height:15px}
-.popover{position:absolute;top:46px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 10px 32px rgba(0,0,0,.4);z-index:200;display:none;flex-direction:column;gap:14px;min-width:240px}
+.popover{position:fixed;top:64px;right:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 10px 32px rgba(0,0,0,.4);z-index:200;display:none;flex-direction:column;gap:14px;min-width:240px}
 .light .popover{box-shadow:0 8px 32px rgba(0,0,0,.12)}
 .popover.show{display:flex}
 .popover-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
@@ -127,6 +127,11 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 .float-theme:hover,.float-theme:active{border-color:var(--gold-dark);background:var(--surface3)}
 .float-theme.visible{display:flex}
 .float-theme svg{width:20px;height:20px}
+.float-settings{position:fixed;bottom:18px;right:14px;width:50px;height:50px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);z-index:55;box-shadow:0 6px 20px rgba(0,0,0,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);-webkit-tap-highlight-color:transparent;padding:0;transition:border-color .15s,color .15s,background .15s}
+.float-settings:hover,.float-settings:active{border-color:var(--gold-dark);background:var(--surface3)}
+.float-settings.visible{display:flex}
+.float-settings svg{width:20px;height:20px}
+.popover.bottom{position:fixed;top:auto;bottom:80px;right:14px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--gold-dark);color:var(--gold);font-size:12px;padding:8px 18px;border-radius:24px;box-shadow:0 4px 18px rgba(0,0,0,.35);z-index:300;opacity:0;transition:opacity .2s;pointer-events:none;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
 .toast.show{opacity:1}
 .juz-marker{display:flex;align-items:center;gap:10px;margin:18px -8px 8px;color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
@@ -169,23 +174,23 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
     <button class="icon-btn" id="themeBtn" onclick="App.toggleTheme()" aria-label="Қоронғи/Ёруғ режимни алмаштириш">
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
     </button>
-    <div class="popover" id="settingsPop" role="dialog" aria-label="Созламалар">
-      <div class="popover-row">
-        <span class="popover-label">Шрифт</span>
-        <div class="fs-stepper" role="group" aria-label="Шрифт ўлчами">
-          <button class="fs-btn" type="button" onclick="App.fz(-1)" aria-label="Кичиклаштириш">−</button>
-          <span class="fs-display" id="fzDisplay">16</span>
-          <button class="fs-btn" type="button" onclick="App.fz(1)" aria-label="Катталаштириш">+</button>
-        </div>
-      </div>
-      <div class="popover-row">
-        <span class="popover-label">Араб матни</span>
-        <button class="ar-toggle" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
-      </div>
-    </div>
   </div>
   </div>
 </header>
+<div class="popover" id="settingsPop" role="dialog" aria-label="Созламалар">
+  <div class="popover-row">
+    <span class="popover-label">Шрифт</span>
+    <div class="fs-stepper" role="group" aria-label="Шрифт ўлчами">
+      <button class="fs-btn" type="button" onclick="App.fz(-1)" aria-label="Кичиклаштириш">−</button>
+      <span class="fs-display" id="fzDisplay">16</span>
+      <button class="fs-btn" type="button" onclick="App.fz(1)" aria-label="Катталаштириш">+</button>
+    </div>
+  </div>
+  <div class="popover-row">
+    <span class="popover-label">Араб матни</span>
+    <button class="ar-toggle" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="homePage">
   <div class="sura-grid-wrap">
@@ -197,6 +202,7 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 <div id="searchPage"></div>
 
 <button type="button" class="float-theme" id="floatTheme" onclick="App.toggleTheme()" aria-label="Қоронғи/Ёруғ режимни алмаштириш"></button>
+<button type="button" class="float-settings" id="floatSettings" onclick="App.toggleSettingsF(event)" aria-label="Созламалар"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 <div class="float-bar" id="floatBar" role="navigation" aria-label="Сура навигацияси">
   <button type="button" class="float-bar-btn" id="fnavPrev" aria-label="Олдинги сура"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
   <button type="button" class="float-bar-btn" id="fnavHome" aria-label="Бош саҳифа" onclick="App.goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></button>
@@ -409,6 +415,8 @@ function showPanel(p){
   if(fb)fb.classList.toggle('visible',p==='sura');
   var ft=document.getElementById('floatTheme');
   if(ft)ft.classList.toggle('visible',p==='sura');
+  var fs=document.getElementById('floatSettings');
+  if(fs)fs.classList.toggle('visible',p==='sura');
   closeSettings();
 }
 
@@ -427,7 +435,7 @@ function applyHash(){
 }
 
 function closeSettings(){
-  var p=document.getElementById('settingsPop');if(p)p.classList.remove('show');
+  var p=document.getElementById('settingsPop');if(p){p.classList.remove('show');p.classList.remove('bottom');}
   var b=document.getElementById('settingsBtn');if(b)b.setAttribute('aria-expanded','false');
 }
 
@@ -451,9 +459,9 @@ window.addEventListener('scroll',function(){
 apTh();apFz();apAr();buildGrid('');
 
 document.addEventListener('click',function(e){
-  var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');
+  var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');var fbtn=document.getElementById('floatSettings');
   if(!pop||!btn)return;
-  if(pop.classList.contains('show')&&!pop.contains(e.target)&&!btn.contains(e.target))closeSettings();
+  if(pop.classList.contains('show')&&!pop.contains(e.target)&&!btn.contains(e.target)&&!(fbtn&&fbtn.contains(e.target)))closeSettings();
 });
 
 window.addEventListener('hashchange',applyHash);
@@ -464,7 +472,8 @@ return{
   open:openSura,
   goHome:goHome,
   toggleTheme:function(){th=th==='dark'?'light':'dark';ss('th',th);apTh();},
-  toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
+  toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');if(open)p.classList.remove('bottom');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
+  toggleSettingsF:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var open=!p.classList.contains('show');if(open)p.classList.add('bottom');p.classList.toggle('show',open);var b=document.getElementById('settingsBtn');if(b)b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
   dsc:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.classList.toggle('open',s);btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
