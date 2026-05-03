@@ -124,10 +124,16 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 .result-text-ar{font-family:'Scheherazade New','Geeza Pro','Noto Naskh Arabic',serif;text-align:right;font-size:18px;line-height:1.9;color:var(--text);margin-bottom:6px;direction:rtl}
 .no-results{text-align:center;padding:60px 14px;color:var(--text-muted);font-size:14px}
 .section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 8px}
-.scroll-top{position:fixed;bottom:22px;right:14px;width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;padding:0;transition:border-color .15s,color .15s}
+.scroll-top{position:fixed;bottom:74px;right:14px;width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent;padding:0;transition:border-color .15s,color .15s}
 .scroll-top:hover{border-color:var(--gold-dark)}
 .scroll-top svg{width:14px;height:14px}
 .scroll-top.visible{display:flex}
+.float-nav{position:fixed;bottom:18px;width:46px;height:46px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);z-index:55;box-shadow:0 4px 14px rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;padding:0;transition:transform .15s,border-color .15s,color .15s,background .15s}
+.float-nav:hover,.float-nav:active{border-color:var(--gold-dark);background:var(--surface3);transform:scale(0.96)}
+.float-nav.visible{display:flex}
+.float-nav-prev{left:14px}
+.float-nav-next{right:14px}
+.float-nav svg{width:20px;height:20px}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--gold-dark);color:var(--gold);font-size:12px;padding:8px 18px;border-radius:24px;box-shadow:0 4px 18px rgba(0,0,0,.35);z-index:300;opacity:0;transition:opacity .2s;pointer-events:none;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
 .toast.show{opacity:1}
 .juz-marker{display:flex;align-items:center;gap:10px;margin:18px -8px 8px;color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
@@ -198,6 +204,8 @@ body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar
 <div id="searchPage"></div>
 
 <button type="button" class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Юқорига қайтиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></button>
+<button type="button" class="float-nav float-nav-prev" id="fnavPrev" aria-label="Олдинги сура"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
+<button type="button" class="float-nav float-nav-next" id="fnavNext" aria-label="Кейинги сура"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
 <script src="data.js"></script>
 <script>
 var App=(function(){
@@ -329,6 +337,17 @@ function openSura(num,hw,scrollVerse){
     setTimeout(function(){var el=document.getElementById('v-'+scrollVerse);if(el)el.scrollIntoView({block:'center',behavior:'smooth'});},80);
   }else{window.scrollTo(0,0);}
   setHash('/'+num+(scrollVerse?'/'+scrollVerse:''));
+  apFnav();
+}
+
+function apFnav(){
+  var p=document.getElementById('fnavPrev'),n=document.getElementById('fnavNext');
+  if(!p||!n)return;
+  var prev=curN&&curN>1?curN-1:0,next=curN&&curN<114?curN+1:0;
+  p.className='float-nav float-nav-prev'+(prev?' visible':'');
+  n.className='float-nav float-nav-next'+(next?' visible':'');
+  p.onclick=prev?function(){App.open(prev);}:null;
+  n.onclick=next?function(){App.open(next);}:null;
 }
 
 var sT=null;
@@ -406,6 +425,11 @@ function showPanel(p){
   document.getElementById('backBtn').className='back-btn'+(p!=='home'?' visible':'');
   document.querySelector('header').classList.toggle('in-page',p!=='home');
   document.getElementById('progressBar').style.width='0%';
+  if(p!=='sura'){
+    var fp=document.getElementById('fnavPrev'),fn=document.getElementById('fnavNext');
+    if(fp)fp.className='float-nav float-nav-prev';
+    if(fn)fn.className='float-nav float-nav-next';
+  }
   closeSettings();
 }
 
