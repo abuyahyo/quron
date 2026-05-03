@@ -77,14 +77,6 @@ body.in-sura .reading-progress{top:0}
 #suraPage{display:none;max-width:720px;margin:0 auto;padding:28px 14px 120px; opacity: 0; transition: opacity 0.3s ease;}
 #suraPage.visible{display:block; opacity: 1;}
 .sura-pg-header{text-align:center;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border);position:relative}
-.sura-cart{position:relative;margin:6px 14px 18px;padding:18px 24px 14px;border:1px solid var(--gold);border-radius:6px;background:linear-gradient(180deg,rgba(201,168,76,0.10),rgba(201,168,76,0.02));box-shadow:inset 0 0 0 3px var(--bg),inset 0 0 0 4px var(--gold-dark)}
-.cart-corner{position:absolute;width:22px;height:22px;color:var(--gold);pointer-events:none}
-.cart-corner.tl{top:-7px;left:-7px}
-.cart-corner.tr{top:-7px;right:-7px;transform:scaleX(-1)}
-.cart-corner.bl{bottom:-7px;left:-7px;transform:scaleY(-1)}
-.cart-corner.br{bottom:-7px;right:-7px;transform:scale(-1,-1)}
-.sura-cart .sura-pg-title-ar{margin-bottom:6px}
-.sura-cart .sura-pg-title{margin-bottom:0}
 .sura-pg-title-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;font-size:38px;color:var(--gold);direction:rtl;line-height:1.4;margin-bottom:8px}
 .sura-pg-title{font-size:24px;color:var(--text);font-style:italic;margin-bottom:4px}
 .sura-pg-meta{display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -325,15 +317,8 @@ function openSura(num,hw,scrollVerse){
     vH+='</div>';
   }
   var html='<div class="sura-pg-header">';
-  var corner='<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 C 2 4, 4 2, 8 2"/><path d="M5 8 C 5 6, 6 5, 8 5"/><circle cx="3" cy="3" r="1.2" fill="currentColor" stroke="none"/></svg>';
-  html+='<div class="sura-cart">';
-  html+='<svg class="cart-corner tl" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 C 2 4, 4 2, 8 2"/><path d="M5 8 C 5 6, 6 5, 8 5"/><circle cx="3" cy="3" r="1.2" fill="currentColor" stroke="none"/></svg>';
-  html+='<svg class="cart-corner tr" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 C 2 4, 4 2, 8 2"/><path d="M5 8 C 5 6, 6 5, 8 5"/><circle cx="3" cy="3" r="1.2" fill="currentColor" stroke="none"/></svg>';
   if(sura.nameAr)html+='<div class="sura-pg-title-ar" dir="rtl" lang="ar">'+esc(sura.nameAr)+'</div>';
   html+='<h2 class="sura-pg-title">'+esc(sura.name)+'</h2>';
-  html+='<svg class="cart-corner bl" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 C 2 4, 4 2, 8 2"/><path d="M5 8 C 5 6, 6 5, 8 5"/><circle cx="3" cy="3" r="1.2" fill="currentColor" stroke="none"/></svg>';
-  html+='<svg class="cart-corner br" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 C 2 4, 4 2, 8 2"/><path d="M5 8 C 5 6, 6 5, 8 5"/><circle cx="3" cy="3" r="1.2" fill="currentColor" stroke="none"/></svg>';
-  html+='</div>';
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span>';
   if(sura.description)html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';
   html+='</div>';
