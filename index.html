@@ -100,12 +100,8 @@ body.in-sura .reading-progress{top:0}
 .verse:last-of-type{border-bottom:0}
 .verse:active,.verse:hover{background:var(--surface)}
 .verse.highlighted{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15)}
-.verse-num{float:left;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);min-width:36px;height:36px;position:relative;display:inline-flex;align-items:center;justify-content:center;border:0;padding:0 11px;margin:3px 13px 0 0;text-align:center;line-height:1;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;font-weight:600;letter-spacing:.04em;transition:color .15s,filter .15s}
-.verse-num:hover,.verse-num:active{color:var(--gold-light);filter:drop-shadow(0 0 4px rgba(201,168,76,.4))}
-.verse-num .ayah-orn{position:absolute;inset:0;width:100%;height:100%;color:var(--gold-dark);pointer-events:none}
-.verse-num.combo{background:radial-gradient(circle,rgba(201,168,76,0.18),rgba(201,168,76,0.02));border:1px solid var(--gold-dark);border-radius:999px}
-.verse-num.combo .ayah-orn{display:none}
-.verse-num span.lbl{position:relative;z-index:1}
+.verse-num{float:left;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);min-width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--gold-dark);border-radius:999px;padding:0 11px;margin:3px 13px 0 0;text-align:center;line-height:1;background:radial-gradient(circle,rgba(201,168,76,0.18),rgba(201,168,76,0.02));cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s,background .15s;font-weight:600;letter-spacing:.04em}
+.verse-num:hover,.verse-num:active{border-color:var(--gold);color:var(--gold-light);background:radial-gradient(circle,rgba(201,168,76,0.32),rgba(201,168,76,0.08))}
 .verse-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:22px;line-height:1.95;color:var(--text);margin-bottom:14px;padding-bottom:12px;font-weight:400;position:relative}
 .verse-ar::after{content:'';position:absolute;left:20%;right:20%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7}
 .verse-text{line-height:1.95;color:var(--text)}
@@ -319,9 +315,7 @@ function openSura(num,hw,scrollVerse){
     var hilit=(hw&&v.text.toLowerCase().indexOf(hw.toLowerCase())>=0)||(scrollVerse&&v.label===scrollVerse);
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
-    var combo=v.label.indexOf('-')>=0;
-    var orn=combo?'':'<svg class="ayah-orn" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="11.5" fill="rgba(201,168,76,0.18)" stroke="currentColor" stroke-width="1"/><g fill="currentColor"><circle cx="18" cy="2.4" r="1.5"/><circle cx="18" cy="33.6" r="1.5"/><circle cx="2.4" cy="18" r="1.5"/><circle cx="33.6" cy="18" r="1.5"/><circle cx="6.9" cy="6.9" r="1.1"/><circle cx="29.1" cy="6.9" r="1.1"/><circle cx="6.9" cy="29.1" r="1.1"/><circle cx="29.1" cy="29.1" r="1.1"/></g></svg>';
-    vH+='<button class="verse-num'+(combo?' combo':'')+'" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха олиш">'+orn+'<span class="lbl">'+lbl+'</span></button>';
+    vH+='<button class="verse-num" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха олиш">'+lbl+'</button>';
     if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+esc(v.ar)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
     if(p.iz){
