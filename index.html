@@ -86,6 +86,13 @@ body.in-sura .reading-progress{top:0}
 .sura-pg-desc.show{display:block}
 .desc-toggle{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 11px;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .15s,color .15s,background .15s}
 .desc-toggle:hover,.desc-toggle:active{border-color:var(--gold-dark);color:var(--gold);background:var(--surface2)}
+.jump-verse{display:inline-flex;align-items:stretch;background:transparent;border:1px solid var(--border);border-radius:14px;overflow:hidden;height:26px}
+.jump-verse input{background:transparent;border:0;color:var(--gold-dark);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;padding:0 10px;width:90px;outline:none;-moz-appearance:textfield;text-transform:uppercase}
+.jump-verse input::-webkit-outer-spin-button,.jump-verse input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.jump-verse input::placeholder{color:var(--text-muted)}
+.jump-verse button{background:var(--surface2);border:0;border-left:1px solid var(--border);color:var(--gold);font-family:inherit;font-size:13px;padding:0 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color .15s,background .15s}
+.jump-verse button:hover,.jump-verse button:active{color:var(--gold-light);background:var(--surface3)}
+.verse.flash{background:rgba(201,168,76,.18)!important;transition:background 1.4s}
 .reading-progress{position:fixed;top:58px;left:0;right:0;height:2px;z-index:99}
 .reading-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold));width:0%;transition:width .1s}
 .verse{padding:14px 8px;border-radius:6px;margin:0 -8px 2px;border-bottom:1px solid var(--border)}
@@ -321,6 +328,7 @@ function openSura(num,hw,scrollVerse){
   html+='<h2 class="sura-pg-title">'+esc(sura.name)+' сураси</h2>';
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span>';
   if(sura.description)html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';
+  html+='<form class="jump-verse" onsubmit="App.jumpV(event)"><input id="jumpInput" type="number" min="1" max="'+sura.verseCount+'" placeholder="Оятга ўтиш" inputmode="numeric" aria-label="Оят рақами"><button type="submit" aria-label="Ўтиш">→</button></form>';
   html+='</div>';
   if(sura.description)html+='<div class="sura-pg-desc" id="descCard">'+esc(sura.description)+'</div>';
   html+='</div>';
@@ -489,6 +497,7 @@ return{
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
   dsc:function(btn){var el=document.getElementById('descCard');if(!el)return;var s=el.classList.toggle('show');btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
+  jumpV:function(ev){if(ev)ev.preventDefault();var inp=document.getElementById('jumpInput');if(!inp||!curN)return;var n=parseInt(inp.value,10);var sura=gS(curN);if(!sura||!n||n<1||n>sura.verseCount){inp.value='';return;}var label=null;for(var i=0;i<sura.verses.length;i++){if(sura.verses[i].nums.indexOf(n)>=0){label=sura.verses[i].label;break;}}if(!label)return;var el=document.getElementById('v-'+label);if(!el)return;el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1500);inp.value='';inp.blur();},
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
   cp:function(n,lbl){var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   doSearch:doSearch
