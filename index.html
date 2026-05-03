@@ -78,9 +78,7 @@ body.in-sura .reading-progress{top:0}
 #suraPage.visible{display:block; opacity: 1;}
 .sura-pg-header{text-align:center;margin-bottom:28px;padding-bottom:22px;border-bottom:1px solid var(--border);position:relative}
 .sura-pg-title-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;font-size:38px;color:var(--gold);direction:rtl;line-height:1.4;margin-bottom:8px}
-.sura-pg-title{font-size:24px;color:var(--text);font-style:italic;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:14px}
-.sura-pg-title .orn{flex-shrink:0;color:var(--gold);width:64px;height:18px;opacity:.85}
-.sura-pg-title .orn.right{transform:scaleX(-1)}
+.sura-pg-title{font-size:24px;color:var(--text);font-style:italic;margin-bottom:4px}
 .sura-pg-meta{display:flex;flex-direction:column;align-items:center;gap:10px}
 .meta-pill{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
 .sura-pg-bismillah{text-align:center;font-family:'Scheherazade New',serif;font-size:26px;color:var(--gold-light);padding:18px 0;margin-bottom:14px;direction:rtl}
@@ -320,8 +318,7 @@ function openSura(num,hw,scrollVerse){
   }
   var html='<div class="sura-pg-header">';
   if(sura.nameAr)html+='<div class="sura-pg-title-ar" dir="rtl" lang="ar">'+esc(sura.nameAr)+'</div>';
-  var ornSvg='<svg class="orn" viewBox="0 0 64 18" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9 C 1 5, 5 2, 9 4 C 13 6, 11 11, 7 11"/><path d="M11 9 C 20 13, 28 4, 38 9 C 47 13, 54 6, 60 9"/><circle cx="62" cy="9" r="1.1" fill="currentColor" stroke="none"/></svg>';
-  html+='<h2 class="sura-pg-title">'+ornSvg+'<span>'+esc(sura.name)+'</span>'+ornSvg.replace('class="orn"','class="orn right"')+'</h2>';
+  html+='<h2 class="sura-pg-title">«'+esc(sura.name)+'»</h2>';
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span>';
   if(sura.description)html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';
   html+='</div>';
