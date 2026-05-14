@@ -38,3 +38,21 @@ There's no test suite, so do a real browser smoke test before declaring work don
 - Sura cards are `<a href="#/N">` so they're shareable; `text-decoration: none; color: inherit;` is required or the multi-line names get underlined.
 - Theme: CSS custom properties on `:root` (dark) and `.light` (light). `--header-bg` is theme-aware so don't hardcode `rgba(...)` for the header.
 - Search precomputes `_nl` (sūra name lowercase) and `_tl` (verse text lowercase) on load — keep that path; do not call `toLowerCase()` per keystroke.
+- When walking `data.js` with regex to swap a JSON string value, use `(?:[^"\\]|\\.)*` for the body — naive `[^"]*` truncates at the first escaped `\"` and silently corrupts long descriptions that contain quoted phrases.
+
+## data.js cache busting
+
+`data.js` is ~4.3 MB and aggressively cached by browsers (iOS Safari especially). The `<script src="data.js?v=YYYYMMDD">` tag in `index.html` carries a query-string version. **Bump the `v=` value whenever `data.js` changes substantively** so returning visitors fetch the new payload instead of replaying their cached copy. Symptom of forgetting: descriptions or verses look truncated/old on the live site even though they're correct in the repo.
+
+## Floating UI / popovers
+
+The sticky `header` uses `backdrop-filter: blur(...)`, which creates a containing block for `position: fixed` descendants. **Any popover or floating button that should anchor to the viewport must live at the body level, not inside `<header>`.** The settings popover lives directly under `<body>` for this reason — moving it back into `.header-actions` will trap fixed positioning inside the 58 px header.
+
+## Sūra descriptions
+
+The canonical source for the long sūra descriptions is `kutubxona_elektron-quron.pdf` in the repo root. Extraction recipe:
+
+1. `pdftotext -layout kutubxona_elektron-quron.pdf -` to dump the layout-preserving text.
+2. Each description starts at a line matching `^\(N\) «Name» сураси` and ends at the first verse line (`^\d+(-\d+)?\. ` or the bismillah-translation line `^Меҳрибон ва раҳмли Аллоҳ номи билан`).
+3. Paragraph breaks: a wrapped line that ends with `.?!»` AND is shorter than ~75 chars is the end of a paragraph (the PDF wraps at ~85 chars). Emit `\n\n` between paragraphs.
+4. `.sura-pg-desc` has `white-space: pre-line` so `\n` and `\n\n` in the data render as real line breaks.
