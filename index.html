@@ -126,9 +126,9 @@ body.in-sura .reading-progress{top:0}
 .grid-header{display:flex;align-items:center;justify-content:space-between;margin:4px 6px 14px}
 .grid-title{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--text-muted)}
 .grid-count{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gold-dark)}
-.sura-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media(min-width:640px){.sura-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
-@media(min-width:1024px){.sura-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}}
+.sura-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.sura-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+@media(min-width:1024px){.sura-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 #suraPage{display:none;max-width:720px;margin:0 auto;padding:28px 14px 120px;opacity:0;transition:opacity .35s ease}
 #suraPage.visible{display:block;opacity:1}
 .sura-pg-header{text-align:center;margin-bottom:28px;padding:26px 20px 22px;border-radius:20px;background:var(--surface);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border:1px solid var(--border);position:relative;overflow:hidden}
@@ -170,7 +170,7 @@ body.in-sura .reading-progress{top:0}
 .sura-footer{margin-top:42px;padding-top:20px;border-top:1px solid var(--border);text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.14em;text-transform:uppercase}
 #searchPage{display:none;max-width:720px;margin:0 auto;padding:24px 14px 100px;opacity:0;transition:opacity .3s ease}
 #searchPage.visible{display:block;opacity:1}
-body.hide-ar .verse-ar,body.hide-ar .card-ar,body.hide-ar .sura-pg-title-ar{display:none}
+body.hide-ar .verse-ar,body.hide-ar .card-name-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .search-pg-header{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
 .search-pg-title{font-size:15px;color:var(--text);margin-bottom:4px}
 .search-pg-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)}
@@ -239,33 +239,29 @@ body.hide-ar .daily-verse-ar{display:none}
 @media(max-width:520px){.daily-section{padding:0 8px;margin-bottom:18px}.daily-verse{padding:20px 18px 18px}.daily-verse-ar{font-size:21px}.daily-verse-text{font-size:14px}.continue-card{padding:12px 14px;gap:12px}.continue-info{font-size:14px}.continue-icon{width:36px;height:36px}}
 
 /* ── СУРА КАРТОЧКА ── */
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.sura-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 14px 14px;min-height:222px;background:var(--surface);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid var(--border);border-radius:20px;overflow:hidden;text-decoration:none;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.22,.61,.36,1),box-shadow .35s,border-color .25s,background .25s;animation:fadeInUp .5s ease both;isolation:isolate}
+.sura-card{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .3s cubic-bezier(.22,.61,.36,1);animation:fadeInUp .45s ease both;background:var(--surface);backdrop-filter:blur(12px) saturate(150%);-webkit-backdrop-filter:blur(12px) saturate(150%);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative;display:flex;align-items:stretch;text-decoration:none;color:inherit}
+.sura-card::before{content:'';position:absolute;inset:0;border-radius:14px;padding:1px;background:linear-gradient(135deg,transparent 30%,var(--gold-dark) 70%,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;pointer-events:none}
 .sura-card.hidden{display:none}
-.card-glow{position:absolute;top:-55%;left:-25%;right:-25%;height:100%;background:radial-gradient(ellipse at center,var(--card-hue,var(--aurora-2)) 0%,transparent 65%);filter:blur(40px);opacity:.22;pointer-events:none;z-index:-1;transition:opacity .35s,transform .5s cubic-bezier(.22,.61,.36,1)}
-.light .card-glow{opacity:.42}
-.sura-card:hover,.sura-card:active{transform:translateY(-3px);border-color:var(--gold-dark);background:var(--surface2);box-shadow:0 14px 36px rgba(0,0,0,.32),var(--glow-gold)}
-.light .sura-card:hover,.light .sura-card:active{box-shadow:0 10px 26px rgba(80,50,10,.14),var(--glow-gold)}
-.sura-card:hover .card-glow,.sura-card:active .card-glow{opacity:.5;transform:translateY(6%)}
-.light .sura-card:hover .card-glow,.light .sura-card:active .card-glow{opacity:.72}
-.card-medallion{position:relative;width:58px;height:58px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--gold-dark)}
-.card-medallion svg{width:100%;height:100%;position:absolute;inset:0;transition:transform .55s cubic-bezier(.4,0,.2,1);opacity:.85}
-.sura-card:hover .card-medallion svg,.sura-card:active .card-medallion svg{transform:rotate(22.5deg) scale(1.04);color:var(--gold);opacity:1}
-.medallion-num{position:relative;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.02em}
-.card-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;font-size:30px;line-height:1.2;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;filter:drop-shadow(0 0 14px rgba(232,208,138,.18));max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
-.card-name{font-family:'Playfair Display','Georgia',serif;font-size:16px;font-weight:600;color:var(--text);font-style:italic;letter-spacing:.005em;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;line-height:1.3}
-.card-meta{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:14px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.14em}
-.card-meta-dot{opacity:.5}
-.card-type-badge{display:inline-flex;align-items:center;gap:5px}
+.sura-card:active,.sura-card:hover{border-color:transparent;background:var(--surface2);transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.28),var(--glow-gold)}
+.light .sura-card:active,.light .sura-card:hover{box-shadow:0 8px 22px rgba(80,50,10,.14),var(--glow-gold)}
+.sura-card:hover::before{opacity:1}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-num-block{display:flex;align-items:center;justify-content:center;min-width:56px;border-right:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--gold);font-weight:600;flex-shrink:0;letter-spacing:.04em;background:linear-gradient(180deg,rgba(232,208,138,.18),rgba(124,90,245,.08));position:relative;overflow:hidden}
+.card-num-block::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(232,208,138,.22),transparent 65%);pointer-events:none}
+.card-num-block>*{position:relative}
+.light .card-num-block{background:linear-gradient(180deg,rgba(139,105,20,.16),rgba(168,132,44,.06));color:var(--gold-dark)}
+.card-inner{flex:1;padding:13px 14px;display:flex;align-items:center;gap:10px;min-width:0}
+.card-names{flex:1;min-width:0}
+.card-name-ar{font-family:'Scheherazade New','Amiri','Traditional Arabic','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:21px;color:var(--gold);line-height:1.4;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-name{font-size:16px;color:var(--text);font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.card-type-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);display:inline-flex;align-items:center;gap:5px}
 .card-type-badge svg{width:11px;height:11px;flex-shrink:0}
 .badge-makki svg{color:var(--text)}
 .light .badge-makki svg{color:#000}
 .badge-madani svg{color:#3ad668}
 .light .badge-madani svg{color:#1a8a32}
-.card-verses{letter-spacing:.06em}
-body.hide-ar .sura-card{min-height:188px}
-@media(max-width:480px){.sura-card{padding:20px 12px 12px;min-height:200px;border-radius:18px}.card-ar{font-size:25px}.card-name{font-size:15px}.card-medallion{width:50px;height:50px;margin-bottom:12px}.medallion-num{font-size:14px}.card-meta{font-size:8.5px;gap:6px}}
-@media(max-width:360px){.card-ar{font-size:22px}.card-meta{flex-direction:column;gap:4px;padding-top:10px}.card-meta-dot{display:none}}
+.card-verses{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.04em}
 
 @media(min-width:800px){.header-inner{gap:16px}}
 </style>
@@ -396,7 +392,6 @@ function arFz(s){return Math.round(s*1.4);}
 function apFz(){var els=document.querySelectorAll('.verse-text');for(var i=0;i<els.length;i++)els[i].style.fontSize=fz+'px';var ars=document.querySelectorAll('.verse-ar');var afz=arFz(fz);for(var k=0;k<ars.length;k++)ars[k].style.fontSize=afz+'px';var d=document.getElementById('fzDisplay');if(d)d.textContent=fz;}
 
 var SURA_TYPE=['M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','D','M','D','M','D','M','M','D','D','D','M','M','M','M','M','D','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','D','M','D','M','D','D','M'];
-var HUES=['var(--aurora-1)','var(--aurora-2)','var(--aurora-3)','var(--aurora-4)','var(--gold)'];
 
 var DAILY_AYAHS=[
   {n:1,a:2},{n:1,a:5},
@@ -423,17 +418,17 @@ function buildGrid(q){
     var s=QD[i],qa=normAr(q),ok=!q||s._nl.indexOf(q)>=0||String(s.number).indexOf(q)>=0||(s.nameTr&&s.nameTr.toLowerCase().indexOf(q)>=0)||(qa&&s._anl&&s._anl.indexOf(qa)>=0);
     var stype=SURA_TYPE[s.number-1]==='M'?'makki':'madani';
     var stypelabel=SURA_TYPE[s.number-1]==='M'?'\u041c\u0430\u043a\u043a\u0438\u0439':'\u041c\u0430\u0434\u0430\u043d\u0438\u0439';
-    var hue=HUES[(s.number-1)%HUES.length];
-    h+='<a class="sura-card'+(ok?'':' hidden')+'" data-num="'+s.number+'" data-type="'+stype+'" href="#/'+s.number+'" onclick="event.preventDefault();App.open('+s.number+')" style="--card-hue:'+hue+';animation-delay:'+(i%24*0.022)+'s">';
-    h+='<div class="card-glow" aria-hidden="true"></div>';
-    h+='<div class="card-medallion" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><g stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="20" y="20" width="60" height="60" rx="2"/><rect x="20" y="20" width="60" height="60" rx="2" transform="rotate(45 50 50)"/></g></svg><span class="medallion-num">'+s.number+'</span></div>';
-    if(s.nameAr)h+='<div class="card-ar" dir="rtl" lang="ar">'+esc(s.nameAr)+'</div>';
+    h+='<a class="sura-card'+(ok?'':' hidden')+'" data-num="'+s.number+'" data-type="'+stype+'" href="#/'+s.number+'" onclick="event.preventDefault();App.open('+s.number+')" style="animation-delay:'+(i%20*0.02)+'s">';
+    h+='<div class="card-num-block"><span>'+s.number+'</span></div>';
+    h+='<div class="card-inner">';
+    h+='<div class="card-names">';
+    if(s.nameAr)h+='<div class="card-name-ar">'+esc(s.nameAr)+'</div>';
     h+='<div class="card-name">'+esc(s.name)+'</div>';
-    h+='<div class="card-meta">';
+    h+='</div>';
+    h+='<div class="card-right">';
     h+='<span class="card-type-badge badge-'+stype+'">'+(stype==='makki'?ICN.kaaba:ICN.dome)+'<span>'+stypelabel+'</span></span>';
-    h+='<span class="card-meta-dot" aria-hidden="true">\u00b7</span>';
     h+='<span class="card-verses">'+s.verseCount+' \u043e\u044f\u0442</span>';
-    h+='</div></a>';
+    h+='</div></div></a>';
   }
   g.innerHTML=h;
 }
