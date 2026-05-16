@@ -70,19 +70,24 @@ body::before{content:'';position:fixed;inset:-15%;z-index:-2;background:
 header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);border-bottom:1px solid var(--border);height:58px;transition:background .4s}
 .light header{box-shadow:0 1px 0 rgba(110,80,30,.06),0 4px 18px rgba(80,50,10,.05)}
 .header-inner{max-width:1100px;width:100%;margin:0 auto;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px}
+.header-actions{margin-left:auto}
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
 header.in-page .logo{display:none}
 body.in-sura header{display:none}
 body.in-sura .reading-progress{top:0}
 .logo-text{font-size:14px;font-weight:700;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2;letter-spacing:.01em}
 .logo-sub{font-size:9px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
-.search-wrap{flex:1 1 auto;min-width:0;max-width:520px;position:relative}
-.search-input{width:100%;background:var(--surface);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:15px;padding:8px 34px 8px 14px;border-radius:10px;outline:none;transition:all .25s;height:36px}
+.search-input{width:100%;background:var(--surface);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--text);font-family:inherit;outline:none;transition:all .25s}
 .search-input:focus{border-color:var(--gold-dark);background:var(--surface2);box-shadow:0 0 0 3px rgba(201,168,76,.12),var(--glow-gold)}
-.light .search-input,.light .icon-btn,.light .popover,.light .toast{box-shadow:0 2px 8px rgba(80,50,10,.06)}
-.light .sura-card,.light .result-item,.light .continue-card,.light .daily-verse,.light .sura-pg-header{box-shadow:0 2px 10px rgba(80,50,10,.06)}
 .search-input::placeholder{color:var(--text-muted)}
-.search-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;opacity:.7}
+.light .icon-btn,.light .popover,.light .toast{box-shadow:0 2px 8px rgba(80,50,10,.06)}
+.light .sura-card,.light .result-item,.light .continue-card,.light .daily-verse,.light .sura-pg-header,.light .home-search .search-input{box-shadow:0 2px 10px rgba(80,50,10,.06)}
+.home-search{position:relative;max-width:640px;margin:6px auto 22px;padding:0 4px}
+.home-search .search-input{height:54px;font-size:16px;padding:0 22px 0 52px;border-radius:14px;backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);box-shadow:0 4px 18px rgba(0,0,0,.14)}
+.home-search .search-input:focus{box-shadow:0 0 0 3px rgba(201,168,76,.14),var(--glow-gold),0 6px 24px rgba(0,0,0,.18)}
+.light .home-search .search-input:focus{box-shadow:0 0 0 3px rgba(139,105,20,.18),var(--glow-gold),0 4px 18px rgba(80,50,10,.1)}
+.home-search .search-icon{position:absolute;left:22px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--gold-dark);pointer-events:none;opacity:.85}
+@media(max-width:520px){.home-search{margin:4px auto 18px;padding:0 8px}.home-search .search-input{height:48px;font-size:15px;padding:0 18px 0 46px;border-radius:12px}.home-search .search-icon{left:18px;width:16px;height:16px}}
 .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .icon-btn{background:var(--surface);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--text-dim);width:34px;height:34px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;-webkit-tap-highlight-color:transparent;padding:0;flex-shrink:0;position:relative;transition:all .25s}
 .icon-btn:hover,.icon-btn:active{border-color:var(--gold-dark);color:var(--gold);box-shadow:var(--glow-gold);transform:translateY(-1px)}
@@ -277,10 +282,6 @@ body.hide-ar .daily-verse-ar{display:none}
     <div><div class="logo-text">Қуръони Карим</div><div class="logo-sub">Ўзбекча таржима</div></div>
   </div>
   <button class="back-btn" id="backBtn" onclick="App.goHome()" aria-label="Бош саҳифага қайтиш"><span class="arrow" aria-hidden="true">←</span><span>Бош саҳифа</span></button>
-  <div class="search-wrap" role="search">
-    <input type="search" class="search-input" id="searchInput" placeholder="Қидириш..." autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
-    <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-  </div>
   <div class="header-actions">
     <button class="icon-btn" id="settingsBtn" onclick="App.toggleSettings(event)" aria-label="Созламалар" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -328,6 +329,10 @@ body.hide-ar .daily-verse-ar{display:none}
       </div>
     </section>
     <div id="dailySection" class="daily-section" aria-live="polite"></div>
+    <div class="home-search" role="search">
+      <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" class="search-input" id="searchInput" placeholder="Сура ёки оят бўйича қидириш..." autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
+    </div>
     <div class="grid-header">
       <div class="grid-title">Сураларни танланг</div>
       <div class="grid-count">114 · кирилл таржима</div>
