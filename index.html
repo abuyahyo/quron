@@ -95,17 +95,6 @@ header.in-page .logo{display:none}
 .home-search .search-input::placeholder{color:var(--text-muted)}
 .home-search .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text-muted);pointer-events:none}
 
-.daily-section{padding:0 0 4px}
-.daily-section:empty{display:none}
-.daily-verse{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--emerald);border-radius:12px;padding:14px 16px;margin-bottom:18px;transition:background .12s}
-.daily-verse:hover,.daily-verse:active{background:var(--surface-hi)}
-.daily-verse-label{font-size:11px;font-weight:600;color:var(--emerald);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:block}
-.daily-verse-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;font-size:21px;line-height:1.75;color:var(--text);margin-bottom:8px;font-weight:400}
-.daily-verse-text{font-size:14px;line-height:1.7;color:var(--text-dim);margin-bottom:8px}
-.daily-verse-meta{font-size:12px;color:var(--emerald);font-weight:500}
-.daily-verse-meta .arr{display:none}
-body.hide-ar .daily-verse-ar{display:none}
-
 .grid-header{padding:0 4px 8px;display:flex;align-items:baseline;justify-content:space-between}
 .grid-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em}
 .grid-count{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums}
@@ -207,8 +196,6 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
   .sura-grid-wrap{padding:0 14px 40px}
   .home-search{padding:14px 0 12px}
   .home-search .search-input{height:44px;font-size:14.5px}
-  .daily-verse{padding:12px 14px;border-radius:11px}
-  .daily-verse-ar{font-size:19px}
   .sura-card{padding:11px 13px;gap:12px}
   .card-num{width:32px;height:32px;font-size:12.5px}
   .card-name{font-size:14.5px}
@@ -258,7 +245,6 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
       <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="search" class="search-input" id="searchInput" placeholder="Сура ёки оят бўйича қидириш" autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
     </div>
-    <div id="dailySection" class="daily-section" aria-live="polite"></div>
     <div class="grid-header">
       <div class="grid-title">Суралар</div>
       <div class="grid-count">114</div>
@@ -323,22 +309,6 @@ function arFz(s){return Math.round(s*1.4);}
 function apFz(){var els=document.querySelectorAll('.verse-text');for(var i=0;i<els.length;i++)els[i].style.fontSize=fz+'px';var ars=document.querySelectorAll('.verse-ar');var afz=arFz(fz);for(var k=0;k<ars.length;k++)ars[k].style.fontSize=afz+'px';var d=document.getElementById('fzDisplay');if(d)d.textContent=fz;}
 
 var SURA_TYPE=['M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','D','M','D','M','D','M','M','D','D','D','M','M','M','M','M','D','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','D','M','D','M','D','D','M'];
-
-var DAILY_AYAHS=[
-  {n:1,a:2},{n:1,a:5},
-  {n:2,a:152},{n:2,a:153},{n:2,a:186},{n:2,a:201},{n:2,a:255},{n:2,a:286},
-  {n:3,a:8},{n:3,a:26},{n:3,a:185},
-  {n:6,a:162},{n:13,a:28},{n:14,a:7},{n:17,a:80},{n:18,a:10},
-  {n:20,a:114},{n:23,a:118},{n:24,a:35},{n:25,a:74},
-  {n:39,a:53},{n:40,a:60},{n:49,a:13},{n:55,a:13},
-  {n:64,a:11},{n:65,a:3},{n:67,a:2},{n:73,a:8},
-  {n:93,a:5},{n:94,a:5},{n:99,a:7},{n:103,a:1},
-  {n:108,a:1},{n:112,a:1},{n:113,a:1},{n:114,a:1}
-];
-function findVerseByAyah(suraN,ayahN){var s=gS(suraN);if(!s)return null;for(var i=0;i<s.verses.length;i++){if(s.verses[i].nums.indexOf(ayahN)>=0)return{sura:s,verse:s.verses[i]};}return null;}
-function dailyIndex(){var d=new Date();var st=new Date(d.getFullYear(),0,0);var diff=d.getTime()-st.getTime();var doy=Math.floor(diff/86400000);var L=DAILY_AYAHS.length;return((doy%L)+L)%L;}
-function getDailyVerse(){var L=DAILY_AYAHS.length;for(var i=0;i<L;i++){var idx=(dailyIndex()+i)%L;var hit=findVerseByAyah(DAILY_AYAHS[idx].n,DAILY_AYAHS[idx].a);if(hit)return hit;}return null;}
-function renderDailySection(){var sec=document.getElementById('dailySection');if(!sec)return;var h='';var d=getDailyVerse();if(d){var dt=d.verse.text;var iz=dt.indexOf('Изоҳ:');if(iz>=0)dt=dt.substring(0,iz).trim();var dhref='#/'+d.sura.number+'/'+d.verse.label;h+='<a class="daily-verse" href="'+dhref+'" onclick="event.preventDefault();App.open('+d.sura.number+',\'\',\''+esc(d.verse.label)+'\')">';h+='<span class="daily-verse-label">Кун ояти</span>';if(d.verse.ar)h+='<div class="daily-verse-ar" dir="rtl" lang="ar">'+esc(d.verse.ar)+'</div>';h+='<div class="daily-verse-text">'+esc(dt)+'</div>';h+='<div class="daily-verse-meta">'+esc(d.sura.name)+' · '+esc(d.verse.label)+'-оят <span class="arr" aria-hidden="true">→</span></div>';h+='</a>';}sec.innerHTML=h;}
 
 function buildGrid(q){
   q=(q||'').toLowerCase().trim();
@@ -445,7 +415,7 @@ function renderVerseHits(q){
 }
 function liveSearch(q){buildGrid(q);renderVerseHits(q);}
 
-function goHome(){curN=null;document.getElementById('searchInput').value='';buildGrid('');renderVerseHits('');renderDailySection();showPanel('home');window.scrollTo(0,0);setHash('');}
+function goHome(){curN=null;document.getElementById('searchInput').value='';buildGrid('');renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
 
 function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
@@ -491,7 +461,7 @@ window.addEventListener('scroll',function(){
   }
 });
 
-apTh();apFz();apAr();buildGrid('');renderDailySection();
+apTh();apFz();apAr();buildGrid('');
 
 document.addEventListener('click',function(e){
   var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');
