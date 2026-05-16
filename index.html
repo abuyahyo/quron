@@ -54,7 +54,6 @@ header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-fi
 .header-inner{max-width:720px;width:100%;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:12px}
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
 header.in-page .logo{display:none}
-body.in-sura header{display:none}
 .logo-text{font-size:15.5px;font-weight:600;color:var(--text);line-height:1.1;letter-spacing:-.01em}
 .logo-sub{font-size:11px;color:var(--text-muted);letter-spacing:.04em;margin-top:2px;font-weight:500}
 
@@ -72,7 +71,6 @@ body.in-sura header{display:none}
 .popover{position:fixed;top:62px;right:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow-md);z-index:200;display:none;flex-direction:column;gap:8px;min-width:240px}
 .popover.show{display:flex;animation:popIn .14s ease}
 @keyframes popIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-.popover.bottom{position:fixed;top:auto;bottom:80px;right:14px}
 .popover-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 4px}
 .popover-label{font-size:13px;color:var(--text-dim);font-weight:500}
 
@@ -195,13 +193,6 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .float-bar-btn:not(:last-child){border-right:1px solid var(--divider)}
 .float-bar-btn svg{width:18px;height:18px}
 
-.float-theme,.float-settings{position:fixed;bottom:18px;width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--emerald);z-index:55;box-shadow:var(--shadow-md);padding:0;transition:all .12s}
-.float-theme{left:14px}
-.float-settings{right:14px}
-.float-theme:hover,.float-theme:active,.float-settings:hover,.float-settings:active{background:var(--surface-hi)}
-.float-theme.visible,.float-settings.visible{display:flex}
-.float-theme svg,.float-settings svg{width:18px;height:18px}
-
 .scroll-top{position:fixed;bottom:78px;right:21px;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--emerald);z-index:54;box-shadow:var(--shadow-sm);padding:0;transition:background .12s}
 .scroll-top:hover,.scroll-top:active{background:var(--surface-hi)}
 .scroll-top.visible{display:flex}
@@ -280,9 +271,7 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 <div id="suraPage"></div>
 <div id="searchPage"></div>
 
-<button type="button" class="float-theme" id="floatTheme" onclick="App.toggleTheme()" aria-label="Қоронғи/Ёруғ режимни алмаштириш"></button>
 <button type="button" class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Юқорига қайтиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></button>
-<button type="button" class="float-settings" id="floatSettings" onclick="App.toggleSettingsF(event)" aria-label="Созламалар"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 <div class="float-bar" id="floatBar" role="navigation" aria-label="Сура навигацияси">
   <button type="button" class="float-bar-btn" id="fnavPrev" aria-label="Олдинги сура"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
   <button type="button" class="float-bar-btn" id="fnavHome" aria-label="Бош саҳифа" onclick="App.goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></button>
@@ -328,7 +317,7 @@ function hl(t,q){
   catch(e2){return s;}
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
-function apTh(){document.body.classList.toggle('light',th==='light');var ic=th==='light'?ICN.moon:ICN.sun;var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=ic;var ft=document.getElementById('floatTheme');if(ft)ft.innerHTML=ic;}
+function apTh(){document.body.classList.toggle('light',th==='light');var ic=th==='light'?ICN.moon:ICN.sun;var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=ic;}
 function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b){b.innerHTML=showAr?ICN.eyeOff:ICN.eye;b.title=showAr?'Араб матнини яшириш':'Араб матнини кўрсатиш';b.classList.toggle('on',showAr);}}
 function toast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show';clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast';},1800);}
 function copyText(t){if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);return Promise.resolve();}catch(e){return Promise.reject(e);}}
@@ -500,15 +489,11 @@ function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
   document.getElementById('suraPage').className=p==='sura'?'visible':'';
   document.getElementById('searchPage').className=p==='search'?'visible':'';
-  document.getElementById('backBtn').className='back-btn'+(p==='search'?' visible':'');
+  document.getElementById('backBtn').className='back-btn'+(p!=='home'?' visible':'');
   document.querySelector('header').classList.toggle('in-page',p!=='home');
   document.body.classList.toggle('in-sura',p==='sura');
   var fb=document.getElementById('floatBar');
   if(fb)fb.classList.toggle('visible',p==='sura');
-  var ft=document.getElementById('floatTheme');
-  if(ft)ft.classList.toggle('visible',p==='sura');
-  var fs=document.getElementById('floatSettings');
-  if(fs)fs.classList.toggle('visible',p==='sura');
   if(p!=='sura'){var st=document.getElementById('scrollTop');if(st)st.classList.remove('visible');}
   closeSettings();
 }
@@ -548,9 +533,9 @@ window.addEventListener('scroll',function(){
 apTh();apFz();apAr();buildGrid('');renderDailySection();
 
 document.addEventListener('click',function(e){
-  var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');var fbtn=document.getElementById('floatSettings');
+  var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');
   if(!pop||!btn)return;
-  if(pop.classList.contains('show')&&!pop.contains(e.target)&&!btn.contains(e.target)&&!(fbtn&&fbtn.contains(e.target)))closeSettings();
+  if(pop.classList.contains('show')&&!pop.contains(e.target)&&!btn.contains(e.target))closeSettings();
 });
 
 window.addEventListener('hashchange',applyHash);
@@ -561,8 +546,7 @@ return{
   open:openSura,
   goHome:goHome,
   toggleTheme:function(){th=th==='dark'?'light':'dark';ss('th',th);apTh();},
-  toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');if(open)p.classList.remove('bottom');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
-  toggleSettingsF:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var open=!p.classList.contains('show');if(open)p.classList.add('bottom');p.classList.toggle('show',open);var b=document.getElementById('settingsBtn');if(b)b.setAttribute('aria-expanded',open?'true':'false');},
+  toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
   dsc:function(btn){var el=document.getElementById('descCard');if(!el)return;var s=el.classList.toggle('show');btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
