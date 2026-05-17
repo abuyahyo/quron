@@ -120,6 +120,7 @@ body.hide-ar .card-name-ar{display:none}
 .sura-pg-title-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;font-size:34px;color:var(--gold);direction:rtl;line-height:1.3;margin-bottom:6px;font-weight:400}
 .sura-pg-title{font-size:22px;font-weight:600;color:var(--text);margin-bottom:8px;letter-spacing:-.015em}
 .sura-pg-meta{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px}
+.sura-pg-controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
 .meta-pill{font-size:12px;color:var(--text-muted);font-weight:500}
 
 .sura-pg-bismillah{text-align:center;font-family:'Scheherazade New',serif;font-size:24px;color:var(--gold);padding:12px 0 22px;direction:rtl;line-height:1.7;font-weight:400}
@@ -143,8 +144,10 @@ body.hide-ar .card-name-ar{display:none}
 .verse.highlighted{background:var(--emerald-soft);margin:0 -14px;padding:18px 14px;border-radius:10px;border-bottom-color:transparent}
 .verse.flash{background:var(--gold-soft)!important;transition:background 1.4s}
 
-.verse-num{float:left;font-family:inherit;font-size:12px;font-weight:600;color:var(--emerald);min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--emerald);border-radius:999px;padding:0 9px;margin:2px 12px 0 0;background:var(--emerald-soft);cursor:pointer;transition:all .12s;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.verse-num{float:left;font-family:inherit;font-size:12px;font-weight:600;color:var(--emerald);min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--emerald);border-radius:999px;padding:0 10px;margin:2px 12px 0 0;background:var(--emerald-soft);cursor:pointer;transition:all .12s;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.verse-num svg{width:11px;height:11px;opacity:.55;transition:opacity .12s}
 .verse-num:hover,.verse-num:active{background:var(--emerald);color:#fff}
+.verse-num:hover svg,.verse-num:active svg{opacity:.95}
 
 .verse-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:22px;line-height:1.95;color:var(--text);margin-bottom:12px;padding-bottom:12px;font-weight:400;border-bottom:1px solid var(--divider)}
 
@@ -171,8 +174,9 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .result-text mark{background:var(--gold-soft);color:var(--text);border-radius:3px;padding:1px 4px;font-weight:500}
 .result-text-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;text-align:right;font-size:18px;line-height:1.85;color:var(--text);margin-bottom:6px;direction:rtl;font-weight:400}
 
-.float-bar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:28px;display:none;align-items:center;z-index:55;box-shadow:var(--shadow-md);overflow:hidden}
+.float-bar{position:fixed;bottom:18px;left:50%;transform:translate(-50%,0);background:var(--surface);border:1px solid var(--border);border-radius:28px;display:none;align-items:center;z-index:55;box-shadow:var(--shadow-md);overflow:hidden;opacity:1;transition:transform .25s ease,opacity .25s ease}
 .float-bar.visible{display:flex}
+.float-bar.scrolled-away{transform:translate(-50%,90px);opacity:0;pointer-events:none}
 .float-bar-btn{background:transparent;border:0;color:var(--emerald);width:52px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .12s,color .12s}
 .float-bar-btn:hover,.float-bar-btn:active{background:var(--surface-hi)}
 .float-bar-btn:disabled{color:var(--text-muted);opacity:.4;cursor:default}
@@ -368,7 +372,7 @@ function openSura(num,hw,scrollVerse){
     var hilit=(hw&&v.text.toLowerCase().indexOf(hw.toLowerCase())>=0)||(scrollVerse&&v.label===scrollVerse);
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
-    vH+='<button class="verse-num" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха олиш">'+lbl+'</button>';
+    vH+='<button class="verse-num" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха олиш"><span>'+lbl+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>';
     if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+esc(v.ar)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
     if(p.iz){
@@ -381,9 +385,10 @@ function openSura(num,hw,scrollVerse){
   if(sura.nameAr)html+='<div class="sura-pg-title-ar" dir="rtl" lang="ar">'+esc(sura.nameAr)+'</div>';
   html+='<h2 class="sura-pg-title">'+esc(sura.name)+' сураси</h2>';
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span>';
+  html+='<div class="sura-pg-controls">';
   if(sura.description)html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';
   html+='<form class="jump-verse" onsubmit="App.jumpV(event)"><input id="jumpInput" type="number" min="1" max="'+sura.verseCount+'" placeholder="Оятга ўтиш" inputmode="numeric" aria-label="Оят рақами"><button type="submit" aria-label="Ўтиш">→</button></form>';
-  html+='</div>';
+  html+='</div></div>';
   if(sura.description)html+='<div class="sura-pg-desc" id="descCard">'+esc(sura.description)+'</div>';
   html+='</div>';
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
@@ -445,7 +450,8 @@ function showPanel(p){
   document.querySelector('header').classList.toggle('in-page',p!=='home');
   document.body.classList.toggle('in-sura',p==='sura');
   var fb=document.getElementById('floatBar');
-  if(fb)fb.classList.toggle('visible',p==='sura');
+  if(fb){fb.classList.toggle('visible',p==='sura');fb.classList.remove('scrolled-away');}
+  _lastY=0;
   if(p!=='sura'){var st=document.getElementById('scrollTop');if(st)st.classList.remove('visible');}
   closeSettings();
 }
@@ -475,12 +481,21 @@ document.getElementById('searchInput').addEventListener('input',function(e){
   sT=setTimeout(function(){liveSearch(v);},200);
 });
 
+var _lastY=0;
 window.addEventListener('scroll',function(){
-  if(curN){
-    var st=document.getElementById('scrollTop');
-    if(st)st.classList.toggle('visible',window.scrollY>400);
+  if(!curN)return;
+  var y=window.scrollY;
+  var st=document.getElementById('scrollTop');
+  if(st)st.classList.toggle('visible',y>400);
+  var fb=document.getElementById('floatBar');
+  if(fb){
+    var dy=y-_lastY;
+    if(y<60){fb.classList.remove('scrolled-away');}
+    else if(dy>6){fb.classList.add('scrolled-away');}
+    else if(dy<-6){fb.classList.remove('scrolled-away');}
   }
-});
+  _lastY=y;
+},{passive:true});
 
 apTh();apFz();apAr();buildGrid('');
 
