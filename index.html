@@ -25,6 +25,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:dark;
   --bg:#0a120e;--bg-sub:#0f1814;--surface:#152018;--surface-hi:#1d2a22;--surface-elev:#22332a;
   --border:rgba(255,255,255,0.07);--border-strong:rgba(255,255,255,0.14);--divider:rgba(255,255,255,0.06);
   --text:#e8efeb;--text-dim:#a8b4ad;--text-muted:#6e7c76;
@@ -46,6 +47,7 @@
   --ambient-2:rgba(212,168,67,0.08)
 }
 .light{
+  color-scheme:light;
   --bg:#f6f8f5;--bg-sub:#f1f4f1;--surface:#ffffff;--surface-hi:#f5f8f6;--surface-elev:#ebefed;
   --border:rgba(0,0,0,0.08);--border-strong:rgba(0,0,0,0.14);--divider:rgba(0,0,0,0.06);
   --text:#0f1a14;--text-dim:#4a5550;--text-muted:#7a857f;
@@ -71,7 +73,7 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%;scrollbar-width:thi
 html::-webkit-scrollbar{width:8px;height:8px}
 html::-webkit-scrollbar-track{background:transparent}
 html::-webkit-scrollbar-thumb{background:var(--emerald-dim);border-radius:8px}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Inter','Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;min-height:100vh;transition:background .2s,color .2s;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Inter','Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.5;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(85% 55% at 18% -8%,var(--ambient-1),transparent 62%),radial-gradient(75% 60% at 105% 28%,var(--ambient-2),transparent 60%),radial-gradient(80% 60% at 50% 110%,var(--ambient-1),transparent 65%)}
 
 header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);height:56px;box-shadow:var(--glass-edge-soft)}
