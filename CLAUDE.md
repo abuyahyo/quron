@@ -4,10 +4,11 @@
 
 Single-page Quran reader (Uzbek translation + Arabic text). Vanilla HTML/CSS/JS, no build step. Two files:
 
-- `index.html` — UI shell, all CSS, all app JS. On load it actively unregisters any previously-registered service worker and clears its caches (the project used to ship a cache-first SW that caused stale-update headaches).
+- `index.html` — UI shell, all CSS, all app JS. On load it registers `sw.js` and calls `registration.update()` so a freshly-deployed SW is picked up on the very next visit.
 - `data.js` — `var QD = [...]` (114 sūras, each verse with `text`/`ar`/`label`/`nums`) and `var KH = "..."` (translator's khatima). Heavy (~4.3 MB) but the browser HTTP cache handles it.
+- `sw.js` — PWA service worker. **Network-first** for `index.html` and `data.js` (always fresh when online, cached fallback when offline), **stale-while-revalidate** for icons and Google Fonts. Uses `skipWaiting()` + `clients.claim()` so an updated SW activates immediately; `activate` deletes any cache whose name doesn't match the current `CACHE_NAME`. Emergency hatch: visiting `?killsw=1` on any path nukes every cache and unregisters the SW.
 
-`sw.js` still exists at the repo root but only as a **kill-switch**: install + activate clear all caches and unregister the registration. It exists solely so that existing users with a registered SW eventually stop being served stale content. Do not re-introduce a real service worker without an explicit ask.
+This was a real headache historically: the project once shipped a cache-first SW that pinned users to stale `index.html`/`data.js` forever. The current SW deliberately treats those two as network-first to avoid repeating that, while still giving offline support for everything else. **Do not switch the HTML or `data.js` strategy back to cache-first** without an explicit ask.
 
 Served via GitHub Pages from `main` at https://abuyahyo.github.io/quron/.
 
@@ -43,6 +44,10 @@ There's no test suite, so do a real browser smoke test before declaring work don
 ## data.js cache busting
 
 `data.js` is ~4.3 MB and aggressively cached by browsers (iOS Safari especially). The `<script src="data.js?v=YYYYMMDD">` tag in `index.html` carries a query-string version. **Bump the `v=` value whenever `data.js` changes substantively** so returning visitors fetch the new payload instead of replaying their cached copy. Symptom of forgetting: descriptions or verses look truncated/old on the live site even though they're correct in the repo.
+
+## sw.js cache version
+
+`sw.js` has a `CACHE_VERSION` constant near the top. The SW name is `quron-<CACHE_VERSION>` and `activate` wipes any other cache. **Bump `CACHE_VERSION` whenever the pre-cached app shell changes** (icons, the SW logic itself, or anything in the `APP_SHELL` array) — that's how stale shell entries get cleared from returning users. You do not need to bump it for ordinary HTML/JS edits, because those go through the network-first path and refresh automatically; bump only when you've changed the shell list or want to force-evict everyone's cache.
 
 ## Floating UI / popovers
 
