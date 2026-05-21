@@ -160,11 +160,15 @@ body.hide-ar .card-name-ar{display:none}
 .verse::after{content:'';display:block;clear:both}
 .verse.highlighted{background:var(--emerald-soft);margin:0 -14px;padding:18px 14px;border-radius:10px;border-bottom-color:transparent}
 .verse.flash{background:var(--gold-soft)!important;transition:background 1.4s}
+.verse.selected{background:var(--emerald-soft);margin:0 -14px;padding:18px 14px;border-radius:10px;border-bottom-color:transparent;-webkit-user-select:none;user-select:none}
 
-.verse-num{float:left;font-family:inherit;font-size:12px;font-weight:600;color:var(--emerald);min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--emerald);border-radius:999px;padding:0 10px;margin:2px 12px 0 0;background:var(--emerald-soft);cursor:pointer;transition:all .12s;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.verse-num{float:left;font-family:inherit;font-size:12px;font-weight:600;color:var(--emerald);min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--emerald);border-radius:999px;padding:0 10px;margin:2px 12px 0 0;background:var(--emerald-soft);cursor:pointer;transition:all .12s;font-variant-numeric:tabular-nums;letter-spacing:-.01em;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .verse-num svg{width:11px;height:11px;opacity:.55;transition:opacity .12s}
 .verse-num:hover,.verse-num:active{background:var(--emerald);color:#fff}
 .verse-num:hover svg,.verse-num:active svg{opacity:.95}
+.verse-num.selected{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+.verse-num.selected svg{opacity:.95}
+body.select-mode .verse-num svg{display:none}
 
 .verse-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;direction:rtl;text-align:right;font-size:22px;line-height:1.95;color:var(--text);margin-bottom:12px;padding-bottom:12px;font-weight:400;border-bottom:1px solid var(--divider)}
 
@@ -194,11 +198,22 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .float-bar{position:fixed;bottom:18px;left:50%;transform:translate(-50%,0);background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:28px;display:none;align-items:center;z-index:55;box-shadow:var(--glass-shadow),var(--glass-edge);overflow:hidden;opacity:1;transition:transform .25s ease,opacity .25s ease}
 .float-bar.visible{display:flex}
 .float-bar.scrolled-away{transform:translate(-50%,90px);opacity:0;pointer-events:none}
+body.select-mode .float-bar{display:none}
 .float-bar-btn{background:transparent;border:0;color:var(--emerald);width:52px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background .12s,color .12s}
 .float-bar-btn:hover,.float-bar-btn:active{background:var(--surface-hi)}
 .float-bar-btn:disabled{color:var(--text-muted);opacity:.4;cursor:default}
-.float-bar-btn:not(:last-child){border-right:1px solid var(--divider)}
+.float-bar-btn:not(:last-child):not(.sb-copy){border-right:1px solid var(--divider)}
 .float-bar-btn svg{width:18px;height:18px}
+
+.select-bar{position:fixed;bottom:18px;left:50%;transform:translate(-50%,90px);background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:28px;display:none;align-items:center;gap:4px;padding:5px 6px 5px 5px;z-index:57;box-shadow:var(--glass-shadow),var(--glass-edge);opacity:0;transition:transform .25s ease,opacity .25s ease}
+.select-bar.visible{display:flex;transform:translate(-50%,0);opacity:1}
+.sb-btn{background:transparent;border:0;color:var(--text-dim);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit;transition:background .12s,color .12s}
+.sb-btn:hover,.sb-btn:active{background:var(--surface-hi);color:var(--text)}
+.sb-btn svg{width:18px;height:18px}
+.sb-count{font-size:13px;font-weight:500;color:var(--text);padding:0 6px;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sb-copy{background:var(--emerald);color:#fff;width:auto;border-radius:22px;padding:0 16px;height:38px;gap:6px;font-size:13.5px;font-weight:500}
+.sb-copy:hover,.sb-copy:active{background:var(--emerald-bright);color:#fff}
+.sb-copy svg{width:15px;height:15px}
 
 .scroll-top{position:fixed;bottom:78px;right:21px;width:36px;height:36px;border-radius:50%;background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--emerald);z-index:54;box-shadow:var(--glass-shadow),var(--glass-edge-soft);padding:0;transition:background .12s,transform .12s}
 .scroll-top:hover,.scroll-top:active{background:var(--surface-hi)}
@@ -287,6 +302,11 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
   <button type="button" class="float-bar-btn" id="fnavHome" aria-label="Бош саҳифа" onclick="App.goHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg></button>
   <button type="button" class="float-bar-btn" id="fnavNext" aria-label="Кейинги сура"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></button>
 </div>
+<div class="select-bar" id="selectBar" role="status" aria-label="Танлаш режими" aria-live="polite">
+  <button type="button" class="sb-btn" id="sbCancel" onclick="App.selCancel()" aria-label="Танлашни бекор қилиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <span class="sb-count"><span id="selectCount">0</span> танланди</span>
+  <button type="button" class="sb-btn sb-copy" onclick="App.selCopy()" aria-label="Танланган оятларни нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Нусхалаш</span></button>
+</div>
 <script src="data.js?v=20260503"></script>
 <script>
 var App=(function(){
@@ -296,6 +316,7 @@ function ss(k,v){try{localStorage.setItem(k,v);}catch(e){_s[k]=v;}}
 var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
 var showAr=sg('ar','0')==='1';
 var navLock=false;
+var selMode=false,selSet={},longPressed=false,pressTimer=null;
 
 function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 
@@ -383,6 +404,7 @@ function openSura(num,hw,scrollVerse){
   hw=hw||'';
   var sura=gS(num);
   if(!sura)return;
+  selExit();
   curN=num;curHw=hw;
   showPanel('sura');
   function pV(t){
@@ -396,7 +418,7 @@ function openSura(num,hw,scrollVerse){
     var hilit=(hw&&v.text.toLowerCase().indexOf(hw.toLowerCase())>=0)||(scrollVerse&&v.label===scrollVerse);
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
-    vH+='<button class="verse-num" type="button" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш" title="Нусха олиш"><span>'+lbl+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>';
+    vH+='<button class="verse-num" type="button" data-num="'+num+'" data-lbl="'+lbl+'" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш ёки узун босиш билан танлаш" title="Нусха олиш — узун босиш билан кўплаб танлаш"><span>'+lbl+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>';
     if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+esc(v.ar)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
     if(p.iz){
@@ -465,7 +487,14 @@ function renderVerseHits(q){
 }
 function liveSearch(q){buildGrid(q);renderVerseHits(q);}
 
-function goHome(){curN=null;document.getElementById('searchInput').value='';buildGrid('');renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
+function selCount(){var n=0;for(var k in selSet)if(selSet[k])n++;return n;}
+function selBar(){var b=document.getElementById('selectBar');if(!b)return;var c=selCount();b.classList.toggle('visible',selMode);var d=document.getElementById('selectCount');if(d)d.textContent=c;}
+function selEnter(lbl){selMode=true;selSet={};selToggle(lbl,true);document.body.classList.add('select-mode');selBar();}
+function selExit(){selMode=false;selSet={};document.body.classList.remove('select-mode');var els=document.querySelectorAll('.verse.selected,.verse-num.selected');for(var i=0;i<els.length;i++)els[i].classList.remove('selected');selBar();}
+function selToggle(lbl,on){var cur=!!selSet[lbl];if(on===undefined)on=!cur;if(on)selSet[lbl]=true;else delete selSet[lbl];var v=document.getElementById('v-'+lbl);if(v){v.classList.toggle('selected',on);var b=v.querySelector('.verse-num');if(b)b.classList.toggle('selected',on);}if(!selCount())selExit();else selBar();}
+function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){parts.push((v.ar?v.ar+'\n':'')+v.label+'. '+v.text);labels.push(v.label);}}if(!parts.length)return;var text=parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(parts.length+' оят нусхаси олинди');selExit();});}
+
+function goHome(){selExit();curN=null;document.getElementById('searchInput').value='';buildGrid('');renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
 
 function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
@@ -523,6 +552,18 @@ window.addEventListener('scroll',function(){
 
 apTh();apFz();apAr();buildGrid('');
 
+function startPress(btn){longPressed=false;if(pressTimer)clearTimeout(pressTimer);pressTimer=setTimeout(function(){pressTimer=null;longPressed=true;var lbl=btn.dataset.lbl;if(!lbl)return;if(!selMode)selEnter(lbl);else selToggle(lbl);if(navigator.vibrate)try{navigator.vibrate(18);}catch(e){}setTimeout(function(){longPressed=false;},120);},450);}
+function endPress(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}}
+document.addEventListener('touchstart',function(e){var b=e.target.closest&&e.target.closest('.verse-num');if(b)startPress(b);},{passive:true});
+document.addEventListener('touchend',endPress);
+document.addEventListener('touchcancel',endPress);
+document.addEventListener('touchmove',endPress,{passive:true});
+document.addEventListener('mousedown',function(e){if(e.button!==0)return;var b=e.target.closest&&e.target.closest('.verse-num');if(b)startPress(b);});
+document.addEventListener('mouseup',endPress);
+document.addEventListener('mouseleave',endPress);
+document.addEventListener('contextmenu',function(e){var b=e.target.closest&&e.target.closest('.verse-num');if(!b)return;e.preventDefault();var lbl=b.dataset.lbl;if(!lbl)return;if(!selMode)selEnter(lbl);else selToggle(lbl);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&selMode)selExit();});
+
 document.addEventListener('click',function(e){
   var pop=document.getElementById('settingsPop');var btn=document.getElementById('settingsBtn');
   if(!pop||!btn)return;
@@ -543,7 +584,9 @@ return{
   dsc:function(btn){var el=document.getElementById('descCard');if(!el)return;var s=el.classList.toggle('show');btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
   jumpV:function(ev){if(ev)ev.preventDefault();var inp=document.getElementById('jumpInput');if(!inp||!curN)return;var n=parseInt(inp.value,10);var sura=gS(curN);if(!sura||!n||n<1||n>sura.verseCount){inp.value='';return;}var label=null;for(var i=0;i<sura.verses.length;i++){if(sura.verses[i].nums.indexOf(n)>=0){label=sura.verses[i].label;break;}}if(!label)return;var el=document.getElementById('v-'+label);if(!el)return;el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1500);inp.value='';inp.blur();},
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
-  cp:function(n,lbl){var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});}
+  cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
+  selCancel:function(){selExit();},
+  selCopy:function(){selCopyDo();}
 };
 })();
 
