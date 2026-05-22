@@ -320,13 +320,17 @@ var selMode=false,selSet={},longPressed=false,pressTimer=null;
 
 function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 
+function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
+
+function normArStrict(s){if(!s)return '';return s.replace(/\u06E1/g,'\u0652').replace(/\u0657/g,'\u064F').replace(/\u0656/g,'\u0650').replace(/\u08F0/g,'\u064B').replace(/\u08F1/g,'\u064C').replace(/\u08F2/g,'\u064D').replace(/\u0670/g,'\u0627').replace(/[\u0610-\u061A\u0653-\u0655\u0658-\u065F\u06D6-\u06E0\u06E2-\u06E8\u06EA-\u06ED\u0640\u200B-\u200F\u08D3-\u08EF\u08F3-\u08FF\uFEFF]/g,'').replace(/[\u0622\u0623\u0625\u0671]/g,'\u0627').replace(/\u0621/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0649/g,'\u0627').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A\u064B-\u0652]/g,'');}
+
 for(var qi=0;qi<QD.length;qi++){
   QD[qi]._nl=QD[qi].name.toLowerCase();
   if(QD[qi].nameAr)QD[qi]._anl=normAr(QD[qi].nameAr);
   var qvs=QD[qi].verses;
   for(var qj=0;qj<qvs.length;qj++){
     qvs[qj]._tl=qvs[qj].text.toLowerCase();
-    if(qvs[qj].ar)qvs[qj]._al=normAr(qvs[qj].ar);
+    if(qvs[qj].ar){qvs[qj]._al=normAr(qvs[qj].ar);qvs[qj]._als=normArStrict(qvs[qj].ar);}
   }
 }
 
@@ -461,13 +465,14 @@ function renderVerseHits(q){
   var box=document.getElementById('verseHits');
   if(!box)return;
   if(!q||q.length<2){box.innerHTML='';return;}
-  var ql=q.toLowerCase(),qa=normAr(q),vr=[];
+  var ql=q.toLowerCase(),strict=hasHarakat(q),qa=strict?normArStrict(q):normAr(q),vr=[];
   for(var i=0;i<QD.length;i++){
     var s=QD[i];
     for(var j=0;j<s.verses.length;j++){
       var vv=s.verses[j];
       var mt=vv._tl.indexOf(ql)>=0;
-      var ma=qa&&vv._al&&vv._al.indexOf(qa)>=0;
+      var aField=strict?vv._als:vv._al;
+      var ma=qa&&aField&&aField.indexOf(qa)>=0;
       if(mt||ma)vr.push({s:s,v:vv,ma:ma});
     }
   }
