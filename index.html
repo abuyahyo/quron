@@ -382,84 +382,109 @@ function wrapText(ctx,text,maxW){
 }
 
 var SURA_TYPE_ARR=['M','D','D','D','D','M','M','D','D','M','M','M','D','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','D','M','M','M','M','M','M','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M'];
-function drawDescBg(ctx,W,H){
-  var grad=ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,'#1f3a2e');grad.addColorStop(1,'#08110d');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  var rg=ctx.createRadialGradient(W*0.2,H*0.0,0,W*0.2,H*0.0,W*0.9);
-  rg.addColorStop(0,'rgba(16,185,129,0.30)');rg.addColorStop(1,'rgba(16,185,129,0)');
-  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
-  var rg2=ctx.createRadialGradient(W*1.0,H*1.0,0,W*1.0,H*1.0,W*0.85);
-  rg2.addColorStop(0,'rgba(212,168,67,0.18)');rg2.addColorStop(1,'rgba(212,168,67,0)');
-  ctx.fillStyle=rg2;ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(52,211,153,0.35)';ctx.lineWidth=2;
+var SANS='-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif';
+function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke){
   ctx.beginPath();
-  var inset=40,radius=36;
-  ctx.moveTo(inset+radius,inset);
-  ctx.lineTo(W-inset-radius,inset);
-  ctx.arcTo(W-inset,inset,W-inset,inset+radius,radius);
-  ctx.lineTo(W-inset,H-inset-radius);
-  ctx.arcTo(W-inset,H-inset,W-inset-radius,H-inset,radius);
-  ctx.lineTo(inset+radius,H-inset);
-  ctx.arcTo(inset,H-inset,inset,H-inset-radius,radius);
-  ctx.lineTo(inset,inset+radius);
-  ctx.arcTo(inset,inset,inset+radius,inset,radius);
-  ctx.closePath();ctx.stroke();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);
+  ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);
+  ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+  if(fill)ctx.fill();
+  if(stroke)ctx.stroke();
 }
-function drawDescHeader(ctx,sura,W){
-  var topY=160;
-  ctx.fillStyle='#d4a843';
-  ctx.font='bold 100px "Scheherazade New","Amiri","Geeza Pro","Noto Naskh Arabic",serif';
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.direction='rtl';
-  ctx.fillText(sura.nameAr||'',W/2,topY+80);
-  ctx.direction='ltr';
-  ctx.fillStyle='#e8efeb';
-  ctx.font='bold 58px Georgia,"Times New Roman",serif';
-  ctx.fillText(sura.name+' сураси',W/2,topY+178);
-  ctx.fillStyle='#a8b4ad';
-  ctx.font='30px Georgia,serif';
-  var stype=(sura.number>=1&&sura.number<=114)?(SURA_TYPE_ARR[sura.number-1]==='M'?'Макка':'Мадина'):'';
-  ctx.fillText(stype+' · '+sura.verseCount+' оят',W/2,topY+222);
-  ctx.strokeStyle='#10b981';ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(W*0.34,topY+262);ctx.lineTo(W*0.66,topY+262);ctx.stroke();
-  return topY+310;
+function drawDescBg(ctx,W,H){
+  var grad=ctx.createLinearGradient(0,0,W*0.3,H);
+  grad.addColorStop(0,'#0f5247');grad.addColorStop(0.5,'#0a3a30');grad.addColorStop(1,'#04221b');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  var rg=ctx.createRadialGradient(W*0.85,H*0.1,0,W*0.85,H*0.1,W*0.9);
+  rg.addColorStop(0,'rgba(16,185,129,0.20)');rg.addColorStop(1,'rgba(16,185,129,0)');
+  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  var rg2=ctx.createRadialGradient(W*0.1,H*0.95,0,W*0.1,H*0.95,W*0.7);
+  rg2.addColorStop(0,'rgba(255,255,255,0.04)');rg2.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=rg2;ctx.fillRect(0,0,W,H);
+}
+function drawPill(ctx,text,x,y){
+  ctx.font='600 26px '+SANS;
+  ctx.textBaseline='middle';ctx.textAlign='left';
+  var tw=ctx.measureText(text).width;
+  var pw=tw+56,ph=52;
+  ctx.fillStyle='rgba(255,255,255,0.14)';
+  drawRoundedRect(ctx,x,y,pw,ph,26,true,false);
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  ctx.fillText(text,x+28,y+ph/2+1);
+  return ph;
+}
+function drawFooter(ctx,pageNum,totalPages,W,H,mx,urlText){
+  ctx.fillStyle='rgba(255,255,255,0.55)';
+  ctx.font='500 26px '+SANS;
+  ctx.textBaseline='alphabetic';
+  if(totalPages>1){
+    ctx.textAlign='left';
+    ctx.fillText(pageNum+' / '+totalPages,mx,H-65);
+  }
+  ctx.textAlign='center';
+  ctx.fillText(urlText,W/2,H-65);
 }
 function drawDescPages(sura){
-  var W=1080,H=1350;
+  var W=1080,H=1350,mx=80;
   var fontSize=42,lineHeight=Math.round(fontSize*1.55);
-  var bodyTop=470,bodyBottom=H-100,bodyLeft=90,bodyRight=W-90;
-  var maxW=bodyRight-bodyLeft;
-  var linesPerPage=Math.floor((bodyBottom-bodyTop)/lineHeight);
+  var maxW=W-2*mx;
   var mCv=document.createElement('canvas');
   mCv.width=W;mCv.height=H;
   var mCtx=mCv.getContext('2d');
-  mCtx.font=fontSize+'px Georgia,"Times New Roman",serif';
+  mCtx.font='500 '+fontSize+'px '+SANS;
   var allLines=wrapText(mCtx,sura.description,maxW);
   while(allLines.length&&allLines[allLines.length-1]==='')allLines.pop();
-  var totalPages=Math.max(1,Math.ceil(allLines.length/linesPerPage));
-  var canvases=[];
+  var p1BodyTop=730,p1BodyBottom=H-130,pnBodyTop=240,pnBodyBottom=H-130;
+  var p1Avail=Math.floor((p1BodyBottom-p1BodyTop)/lineHeight);
+  var pnAvail=Math.floor((pnBodyBottom-pnBodyTop)/lineHeight);
+  var totalPages=1;
+  if(allLines.length>p1Avail)totalPages+=Math.ceil((allLines.length-p1Avail)/pnAvail);
+  var canvases=[],lineIdx=0;
+  var urlText='abuyahyo.github.io/quron#/'+sura.number;
   for(var p=0;p<totalPages;p++){
-    var pageLines=allLines.slice(p*linesPerPage,(p+1)*linesPerPage);
-    while(pageLines.length&&pageLines[0]==='')pageLines.shift();
     var cv=document.createElement('canvas');
     cv.width=W;cv.height=H;
     var ctx=cv.getContext('2d');
     drawDescBg(ctx,W,H);
-    drawDescHeader(ctx,sura,W);
-    ctx.fillStyle='#e8efeb';
-    ctx.font=fontSize+'px Georgia,"Times New Roman",serif';
+    var bodyTop,avail;
+    if(p===0){
+      var stype=SURA_TYPE_ARR[sura.number-1]==='M'?'МАККА':'МАДИНА';
+      drawPill(ctx,'СУРА '+sura.number+' · '+stype+' · '+sura.verseCount+' ОЯТ',mx,130);
+      ctx.fillStyle='#ffffff';
+      ctx.font='800 90px '+SANS;
+      ctx.textBaseline='alphabetic';ctx.textAlign='left';
+      ctx.fillText(sura.name+' сураси',mx,360);
+      if(sura.nameAr){
+        ctx.fillStyle='#e4bc5b';
+        ctx.font='500 88px "Scheherazade New","Amiri","Geeza Pro","Noto Naskh Arabic",serif';
+        ctx.direction='rtl';ctx.textAlign='right';
+        ctx.fillText(sura.nameAr,W-mx,490);
+        ctx.direction='ltr';
+      }
+      bodyTop=p1BodyTop;avail=p1Avail;
+    }else{
+      drawPill(ctx,sura.name+' сураси',mx,130);
+      bodyTop=pnBodyTop;avail=pnAvail;
+    }
+    var pageLines=allLines.slice(lineIdx,lineIdx+avail);
+    while(pageLines.length&&pageLines[0]==='')pageLines.shift();
+    ctx.fillStyle='#ffffff';
+    ctx.font='500 '+fontSize+'px '+SANS;
     ctx.textAlign='left';ctx.textBaseline='alphabetic';
     var y=bodyTop+fontSize;
     for(var li=0;li<pageLines.length;li++){
-      if(pageLines[li])ctx.fillText(pageLines[li],bodyLeft,y);
+      if(pageLines[li])ctx.fillText(pageLines[li],mx,y);
       y+=lineHeight;
     }
-    ctx.fillStyle='#6e7c76';
-    ctx.font='26px Georgia,serif';
-    ctx.textAlign='center';
-    var footer=totalPages>1?((p+1)+' / '+totalPages+'   ·   abuyahyo.github.io/quron'):'abuyahyo.github.io/quron';
-    ctx.fillText(footer,W/2,H-50);
+    drawFooter(ctx,p+1,totalPages,W,H,mx,urlText);
+    lineIdx+=avail;
     canvases.push(cv);
   }
   return canvases;
