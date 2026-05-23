@@ -441,7 +441,7 @@ function drawDescPages(sura){
   mCtx.font='500 '+fontSize+'px '+SANS;
   var allLines=wrapText(mCtx,sura.description,maxW);
   while(allLines.length&&allLines[allLines.length-1]==='')allLines.pop();
-  var p1BodyTop=730,p1BodyBottom=H-130,pnBodyTop=240,pnBodyBottom=H-130;
+  var p1BodyTop=480,p1BodyBottom=H-130,pnBodyTop=240,pnBodyBottom=H-130;
   var p1Avail=Math.floor((p1BodyBottom-p1BodyTop)/lineHeight);
   var pnAvail=Math.floor((pnBodyBottom-pnBodyTop)/lineHeight);
   var totalPages=1;
@@ -461,13 +461,6 @@ function drawDescPages(sura){
       ctx.font='800 90px '+SANS;
       ctx.textBaseline='alphabetic';ctx.textAlign='left';
       ctx.fillText(sura.name+' сураси',mx,360);
-      if(sura.nameAr){
-        ctx.fillStyle='#e4bc5b';
-        ctx.font='500 88px "Scheherazade New","Amiri","Geeza Pro","Noto Naskh Arabic",serif';
-        ctx.direction='rtl';ctx.textAlign='right';
-        ctx.fillText(sura.nameAr,W-mx,490);
-        ctx.direction='ltr';
-      }
       bodyTop=p1BodyTop;avail=p1Avail;
     }else{
       drawPill(ctx,sura.name+' сураси',mx,130);
