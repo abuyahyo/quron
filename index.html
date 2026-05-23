@@ -439,7 +439,7 @@ function drawDescPages(sura){
   mCv.width=W;mCv.height=H;
   var mCtx=mCv.getContext('2d');
   mCtx.font='500 '+fontSize+'px '+SANS;
-  var allLines=wrapText(mCtx,sura.description,maxW);
+  var allLines=wrapText(mCtx,sura.description.replace(/^\(\d+\)\s*/,''),maxW);
   while(allLines.length&&allLines[allLines.length-1]==='')allLines.pop();
   var p1BodyTop=480,p1BodyBottom=H-130,pnBodyTop=240,pnBodyBottom=H-130;
   var p1Avail=Math.floor((p1BodyBottom-p1BodyTop)/lineHeight);
@@ -565,7 +565,7 @@ function openSura(num,hw,scrollVerse){
   if(sura.description){html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';html+='<button class="desc-share" type="button" onclick="App.shareDescImg('+num+',this)" aria-label="Тавсифни расм сифатида улашиш" title="Расм билан улашиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="9" r="1.5"/><path d="M21 16l-5-5L6 21"/></svg></button>';}
   html+='<form class="jump-verse" onsubmit="App.jumpV(event)"><input id="jumpInput" type="number" min="1" max="'+sura.verseCount+'" placeholder="Оятга ўтиш" inputmode="numeric" aria-label="Оят рақами"><button type="submit" aria-label="Ўтиш">→</button></form>';
   html+='</div></div>';
-  if(sura.description)html+='<div class="sura-pg-desc" id="descCard">'+esc(sura.description)+'</div>';
+  if(sura.description)html+='<div class="sura-pg-desc" id="descCard">'+esc(sura.description.replace(/^\(\d+\)\s*/,''))+'</div>';
   html+='</div>';
   if(num!==9)html+='<div class="sura-pg-bismillah">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x62D;&#x650;&#x64A;&#x652;&#x645;&#x650;</div>';
   html+='<div>'+vH+'</div>';
