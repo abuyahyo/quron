@@ -381,11 +381,8 @@ function wrapText(ctx,text,maxW){
   return lines;
 }
 
-function drawDescImage(sura){
-  var W=1080,H=1350;
-  var cv=document.createElement('canvas');
-  cv.width=W;cv.height=H;
-  var ctx=cv.getContext('2d');
+var SURA_TYPE_ARR=['M','D','D','D','D','M','M','D','D','M','M','M','D','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','D','M','M','M','M','M','M','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M'];
+function drawDescBg(ctx,W,H){
   var grad=ctx.createLinearGradient(0,0,0,H);
   grad.addColorStop(0,'#1f3a2e');grad.addColorStop(1,'#08110d');
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
@@ -395,8 +392,7 @@ function drawDescImage(sura){
   var rg2=ctx.createRadialGradient(W*1.0,H*1.0,0,W*1.0,H*1.0,W*0.85);
   rg2.addColorStop(0,'rgba(212,168,67,0.18)');rg2.addColorStop(1,'rgba(212,168,67,0)');
   ctx.fillStyle=rg2;ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='rgba(52,211,153,0.35)';
-  ctx.lineWidth=2;
+  ctx.strokeStyle='rgba(52,211,153,0.35)';ctx.lineWidth=2;
   ctx.beginPath();
   var inset=40,radius=36;
   ctx.moveTo(inset+radius,inset);
@@ -409,49 +405,64 @@ function drawDescImage(sura){
   ctx.lineTo(inset,inset+radius);
   ctx.arcTo(inset,inset,inset+radius,inset,radius);
   ctx.closePath();ctx.stroke();
-  var topY=170;
+}
+function drawDescHeader(ctx,sura,W){
+  var topY=160;
   ctx.fillStyle='#d4a843';
-  ctx.font='bold 110px "Scheherazade New","Amiri","Geeza Pro","Noto Naskh Arabic",serif';
+  ctx.font='bold 100px "Scheherazade New","Amiri","Geeza Pro","Noto Naskh Arabic",serif';
   ctx.textAlign='center';ctx.textBaseline='alphabetic';
   ctx.direction='rtl';
-  ctx.fillText(sura.nameAr||'',W/2,topY+90);
+  ctx.fillText(sura.nameAr||'',W/2,topY+80);
   ctx.direction='ltr';
   ctx.fillStyle='#e8efeb';
-  ctx.font='bold 64px Georgia,"Times New Roman",serif';
-  ctx.fillText(sura.name+' сураси',W/2,topY+200);
+  ctx.font='bold 58px Georgia,"Times New Roman",serif';
+  ctx.fillText(sura.name+' сураси',W/2,topY+178);
   ctx.fillStyle='#a8b4ad';
-  ctx.font='32px Georgia,serif';
-  var stype=(sura.number>=1&&sura.number<=114)?(['M','D','D','D','D','M','M','D','D','M','M','M','D','M','M','M','M','M','M','M','M','D','M','D','M','M','M','M','M','M','M','M','D','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','D','M','M','M','M','M','M','M','D','D','D','D','D','D','D','D','D','D','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','M','D','D','M','M','M','M','M','M','M','M','M','M','D','M','M','M','M'][sura.number-1]==='M'?'Макка':'Мадина'):'';
-  ctx.fillText(stype+' · '+sura.verseCount+' оят',W/2,topY+248);
-  ctx.strokeStyle='#10b981';
-  ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(W*0.32,topY+292);ctx.lineTo(W*0.68,topY+292);ctx.stroke();
-  var bodyTop=topY+340,bodyBottom=H-110,bodyLeft=90,bodyRight=W-90;
+  ctx.font='30px Georgia,serif';
+  var stype=(sura.number>=1&&sura.number<=114)?(SURA_TYPE_ARR[sura.number-1]==='M'?'Макка':'Мадина'):'';
+  ctx.fillText(stype+' · '+sura.verseCount+' оят',W/2,topY+222);
+  ctx.strokeStyle='#10b981';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(W*0.34,topY+262);ctx.lineTo(W*0.66,topY+262);ctx.stroke();
+  return topY+310;
+}
+function drawDescPages(sura){
+  var W=1080,H=1350;
+  var fontSize=42,lineHeight=Math.round(fontSize*1.55);
+  var bodyTop=470,bodyBottom=H-100,bodyLeft=90,bodyRight=W-90;
   var maxW=bodyRight-bodyLeft;
-  var fs=38,lh=58;
-  var lines=null;
-  while(fs>=22){
-    ctx.font=fs+'px Georgia,"Times New Roman",serif';
-    lh=Math.round(fs*1.55);
-    lines=wrapText(ctx,sura.description,maxW);
-    var needed=lines.length*lh;
-    if(needed<=bodyBottom-bodyTop)break;
-    fs-=2;
+  var linesPerPage=Math.floor((bodyBottom-bodyTop)/lineHeight);
+  var mCv=document.createElement('canvas');
+  mCv.width=W;mCv.height=H;
+  var mCtx=mCv.getContext('2d');
+  mCtx.font=fontSize+'px Georgia,"Times New Roman",serif';
+  var allLines=wrapText(mCtx,sura.description,maxW);
+  while(allLines.length&&allLines[allLines.length-1]==='')allLines.pop();
+  var totalPages=Math.max(1,Math.ceil(allLines.length/linesPerPage));
+  var canvases=[];
+  for(var p=0;p<totalPages;p++){
+    var pageLines=allLines.slice(p*linesPerPage,(p+1)*linesPerPage);
+    while(pageLines.length&&pageLines[0]==='')pageLines.shift();
+    var cv=document.createElement('canvas');
+    cv.width=W;cv.height=H;
+    var ctx=cv.getContext('2d');
+    drawDescBg(ctx,W,H);
+    drawDescHeader(ctx,sura,W);
+    ctx.fillStyle='#e8efeb';
+    ctx.font=fontSize+'px Georgia,"Times New Roman",serif';
+    ctx.textAlign='left';ctx.textBaseline='alphabetic';
+    var y=bodyTop+fontSize;
+    for(var li=0;li<pageLines.length;li++){
+      if(pageLines[li])ctx.fillText(pageLines[li],bodyLeft,y);
+      y+=lineHeight;
+    }
+    ctx.fillStyle='#6e7c76';
+    ctx.font='26px Georgia,serif';
+    ctx.textAlign='center';
+    var footer=totalPages>1?((p+1)+' / '+totalPages+'   ·   abuyahyo.github.io/quron'):'abuyahyo.github.io/quron';
+    ctx.fillText(footer,W/2,H-50);
+    canvases.push(cv);
   }
-  ctx.fillStyle='#e8efeb';
-  ctx.font=fs+'px Georgia,"Times New Roman",serif';
-  ctx.textAlign='left';ctx.textBaseline='alphabetic';
-  var y=bodyTop+fs;
-  for(var li=0;li<lines.length;li++){
-    if(y>bodyBottom){ctx.fillText('…',bodyLeft,y);break;}
-    if(lines[li])ctx.fillText(lines[li],bodyLeft,y);
-    y+=lh;
-  }
-  ctx.fillStyle='#6e7c76';
-  ctx.font='26px Georgia,serif';
-  ctx.textAlign='center';
-  ctx.fillText('abuyahyo.github.io/quron',W/2,H-55);
-  return cv;
+  return canvases;
 }
 function arFz(s){return Math.round(s*1.4);}
 function apFz(){var els=document.querySelectorAll('.verse-text');for(var i=0;i<els.length;i++)els[i].style.fontSize=fz+'px';var ars=document.querySelectorAll('.verse-ar');var afz=arFz(fz);for(var k=0;k<ars.length;k++)ars[k].style.fontSize=afz+'px';var d=document.getElementById('fzDisplay');if(d)d.textContent=fz;}
@@ -690,7 +701,7 @@ return{
   selCancel:function(){selExit();},
   selCopy:function(){selCopyDo();},
   shareDesc:function(n){var s=gS(n);if(!s||!s.description)return;var title=s.name+' сураси — тавсиф';var text=s.description;var url=location.origin+location.pathname+'#/'+n;if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(){});}else{copyText(text+'\n\n'+url).then(function(){toast('Тавсиф нусхаси олинди');}).catch(function(){});}},
-  shareDescImg:function(n,btn){var s=gS(n);if(!s||!s.description)return;if(btn){btn.disabled=true;}toast('Расм тайёрланмоқда…');setTimeout(function(){try{var blob=null;var canvas=drawDescImage(s);canvas.toBlob(function(b){blob=b;var file=new File([b],'quron-'+s.number+'-'+s.name+'.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:s.name+' сураси'}).catch(function(){}).finally(function(){if(btn)btn.disabled=false;});}else{var url=URL.createObjectURL(b);var a=document.createElement('a');a.href=url;a.download='quron-'+s.number+'-'+s.name+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},500);toast('Расм юкланди');if(btn)btn.disabled=false;}},'image/png',0.95);}catch(e){toast('Хато: расм яратилмади');if(btn)btn.disabled=false;}},50);}
+  shareDescImg:function(n,btn){var s=gS(n);if(!s||!s.description)return;if(btn){btn.disabled=true;}toast('Расм тайёрланмоқда…');setTimeout(function(){try{var canvases=drawDescPages(s);var blobs=new Array(canvases.length);var done=0;canvases.forEach(function(cv,i){cv.toBlob(function(b){blobs[i]=b;done++;if(done===canvases.length){var safe=s.name.replace(/[^\w-]/g,'');var files=blobs.map(function(b,k){return new File([b],'quron-'+s.number+'-'+safe+'-'+(k+1)+'.png',{type:'image/png'});});var ttl=s.name+' сураси'+(files.length>1?' ('+files.length+' расм)':'');if(navigator.canShare&&navigator.canShare({files:files})){navigator.share({files:files,title:ttl}).catch(function(){}).finally(function(){if(btn)btn.disabled=false;});}else{files.forEach(function(f,idx){setTimeout(function(){var url=URL.createObjectURL(f);var a=document.createElement('a');a.href=url;a.download=f.name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},500);},idx*150);});toast(files.length+' та расм юкланди');if(btn)btn.disabled=false;}}},'image/png',0.95);});}catch(e){toast('Хато: расм яратилмади');if(btn)btn.disabled=false;}},50);}
 };
 })();
 
