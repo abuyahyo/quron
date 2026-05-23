@@ -147,6 +147,9 @@ body.hide-ar .card-name-ar{display:none}
 
 .desc-toggle{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-family:inherit;font-size:13px;font-weight:500;padding:7px 14px;border-radius:20px;cursor:pointer;transition:all .12s}
 .desc-toggle:hover,.desc-toggle:active{color:var(--emerald);border-color:var(--emerald)}
+.desc-share{display:inline-flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);width:34px;height:32px;border-radius:20px;cursor:pointer;padding:0;transition:all .12s}
+.desc-share:hover,.desc-share:active{color:var(--emerald);border-color:var(--emerald)}
+.desc-share svg{width:14px;height:14px}
 
 .jump-verse{display:inline-flex;align-items:stretch;background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;height:32px}
 .jump-verse input{background:transparent;border:0;color:var(--text);font-family:inherit;font-size:13px;padding:0 14px;width:130px;outline:none;-moz-appearance:textfield}
@@ -436,7 +439,7 @@ function openSura(num,hw,scrollVerse){
   html+='<h2 class="sura-pg-title">'+esc(sura.name)+' сураси</h2>';
   html+='<div class="sura-pg-meta"><span class="meta-pill">'+sura.verseCount+' оят</span>';
   html+='<div class="sura-pg-controls">';
-  if(sura.description)html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';
+  if(sura.description){html+='<button class="desc-toggle" type="button" onclick="App.dsc(this)" aria-expanded="false" aria-controls="descCard"><span>▼ Тавсифни ўқиш</span></button>';html+='<button class="desc-share" type="button" onclick="App.shareDesc('+num+')" aria-label="Тавсифни улашиш" title="Тавсифни улашиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';}
   html+='<form class="jump-verse" onsubmit="App.jumpV(event)"><input id="jumpInput" type="number" min="1" max="'+sura.verseCount+'" placeholder="Оятга ўтиш" inputmode="numeric" aria-label="Оят рақами"><button type="submit" aria-label="Ўтиш">→</button></form>';
   html+='</div></div>';
   if(sura.description)html+='<div class="sura-pg-desc" id="descCard">'+esc(sura.description)+'</div>';
@@ -591,7 +594,8 @@ return{
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
   cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   selCancel:function(){selExit();},
-  selCopy:function(){selCopyDo();}
+  selCopy:function(){selCopyDo();},
+  shareDesc:function(n){var s=gS(n);if(!s||!s.description)return;var title=s.name+' сураси — тавсиф';var text=s.description;var url=location.origin+location.pathname+'#/'+n;if(navigator.share){navigator.share({title:title,text:text,url:url}).catch(function(){});}else{copyText(text+'\n\n'+url).then(function(){toast('Тавсиф нусхаси олинди');}).catch(function(){});}}
 };
 })();
 
