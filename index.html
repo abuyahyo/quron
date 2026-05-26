@@ -401,16 +401,17 @@ function drawRoundedRect(ctx,x,y,w,h,r,fill,stroke){
 }
 function drawDescBg(ctx,W,H,light){
   var grad=ctx.createLinearGradient(0,0,W*0.3,H);
-  if(light){grad.addColorStop(0,'#ffffff');grad.addColorStop(0.5,'#f1f6f2');grad.addColorStop(1,'#e5eee8');}
+  if(light){grad.addColorStop(0,'#ffffff');grad.addColorStop(0.6,'#fbfdfc');grad.addColorStop(1,'#f3f8f5');}
   else{grad.addColorStop(0,'#0f5247');grad.addColorStop(0.5,'#0a3a30');grad.addColorStop(1,'#04221b');}
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
   var rg=ctx.createRadialGradient(W*0.85,H*0.1,0,W*0.85,H*0.1,W*0.9);
-  rg.addColorStop(0,light?'rgba(16,185,129,0.13)':'rgba(16,185,129,0.20)');rg.addColorStop(1,'rgba(16,185,129,0)');
+  rg.addColorStop(0,light?'rgba(16,185,129,0.07)':'rgba(16,185,129,0.20)');rg.addColorStop(1,'rgba(16,185,129,0)');
   ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
-  var rg2=ctx.createRadialGradient(W*0.1,H*0.95,0,W*0.1,H*0.95,W*0.7);
-  if(light){rg2.addColorStop(0,'rgba(5,150,105,0.06)');rg2.addColorStop(1,'rgba(5,150,105,0)');}
-  else{rg2.addColorStop(0,'rgba(255,255,255,0.04)');rg2.addColorStop(1,'rgba(255,255,255,0)');}
-  ctx.fillStyle=rg2;ctx.fillRect(0,0,W,H);
+  if(!light){
+    var rg2=ctx.createRadialGradient(W*0.1,H*0.95,0,W*0.1,H*0.95,W*0.7);
+    rg2.addColorStop(0,'rgba(255,255,255,0.04)');rg2.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=rg2;ctx.fillRect(0,0,W,H);
+  }
 }
 function drawPill(ctx,text,x,y,light){
   ctx.font='600 26px '+SANS;
