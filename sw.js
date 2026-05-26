@@ -16,7 +16,7 @@
 // Bump CACHE_VERSION whenever the app shell changes substantively (and bump
 // the data.js?v= query string in index.html when data.js changes).
 
-const CACHE_VERSION = '2026-05-26-01';
+const CACHE_VERSION = '2026-05-26-02';
 const CACHE_NAME = 'quron-' + CACHE_VERSION;
 const APP_SHELL = [
   './',
