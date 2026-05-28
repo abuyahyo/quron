@@ -188,7 +188,8 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 
 .verse-hits{margin-top:18px}
 .verse-hits:empty{display:none}
-.hits-more{text-align:center;color:var(--text-muted);font-size:13px;padding:12px}
+.hits-more{display:block;width:100%;text-align:center;color:var(--emerald);font-size:13px;font-weight:600;padding:13px;background:transparent;border:1px solid var(--glass-border);border-radius:12px;cursor:pointer;margin-top:4px;font-family:inherit;transition:background .12s,border-color .12s}
+.hits-more:hover,.hits-more:active{background:var(--surface-hi);border-color:var(--emerald)}
 .no-results{text-align:center;padding:34px 14px;color:var(--text-muted);font-size:14px}
 .section-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 10px;padding:0 4px}
 .result-item{background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:14px;padding:13px 15px;margin-bottom:8px;cursor:pointer;box-shadow:var(--glass-edge-soft);transition:all .12s}
@@ -328,7 +329,7 @@ var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
 var showAr=sg('ar','0')==='1';
 var navLock=false;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
-var hitMode=false,hitSel={};
+var hitMode=false,hitSel={},hitLimit=100;
 
 function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 
@@ -670,7 +671,7 @@ function renderVerseHits(q){
   }
   if(!vr.length){box.innerHTML='';return;}
   var h='<div class="section-label">Оятларда топилди ('+vr.length+' та)</div>';
-  var lim=Math.min(vr.length,100);
+  var lim=Math.min(vr.length,hitLimit);
   for(var i=0;i<lim;i++){
     var r=vr[i];
     var dt=r.v.text;var iz=dt.indexOf('Изоҳ:');if(iz>=0)dt=dt.substring(0,iz).trim();
@@ -680,10 +681,10 @@ function renderVerseHits(q){
     if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+esc(r.v.ar.substring(0,260))+'</div>';
     h+='<div class="result-text">'+hl(dt.substring(0,260),q)+'</div></div>';
   }
-  if(vr.length>lim)h+='<div class="hits-more">ва яна '+(vr.length-lim)+' та</div>';
+  if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
   box.innerHTML=h;
 }
-function liveSearch(q){buildGrid(q);renderVerseHits(q);}
+function liveSearch(q){hitLimit=100;buildGrid(q);renderVerseHits(q);}
 
 function selCount(){var n=0;for(var k in selSet)if(selSet[k])n++;return n;}
 function selBar(){var b=document.getElementById('selectBar');if(!b)return;var active=selMode||hitMode;var c=hitMode?hitCount():selCount();b.classList.toggle('visible',active);var d=document.getElementById('selectCount');if(d)d.textContent=c;}
@@ -790,6 +791,7 @@ return{
   cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   cpHit:function(ev,n,lbl){if(ev&&ev.stopPropagation)ev.stopPropagation();if(longPressed){longPressed=false;return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var m=v.text;var iz=m.indexOf('Изоҳ:');if(iz>=0)m=m.substring(0,iz).trim();var t=(v.ar?v.ar+'\n\n':'')+m+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   hitTap:function(ev,n,lbl,q){if(longPressed){longPressed=false;return;}if(hitMode){hitToggle(n,lbl);return;}openSura(n,q,lbl);},
+  moreHits:function(){hitLimit+=100;renderVerseHits(document.getElementById('searchInput').value);},
   selCancel:function(){if(hitMode)hitExit();else selExit();},
   selCopy:function(){if(hitMode)hitCopyDo();else selCopyDo();},
   shareDescImg:function(n,btn){var s=gS(n);if(!s||!s.description)return;if(btn){btn.disabled=true;}toast('Расм тайёрланмоқда…');setTimeout(function(){try{var canvases=drawDescPages(s);var blobs=new Array(canvases.length);var done=0;canvases.forEach(function(cv,i){cv.toBlob(function(b){blobs[i]=b;done++;if(done===canvases.length){var safe=s.name.replace(/[^\w-]/g,'');var files=blobs.map(function(b,k){return new File([b],'quron-'+s.number+'-'+safe+'-'+(k+1)+'.png',{type:'image/png'});});var ttl=s.name+' сураси'+(files.length>1?' ('+files.length+' расм)':'');if(navigator.canShare&&navigator.canShare({files:files})){navigator.share({files:files,title:ttl}).catch(function(){}).finally(function(){if(btn)btn.disabled=false;});}else{files.forEach(function(f,idx){setTimeout(function(){var url=URL.createObjectURL(f);var a=document.createElement('a');a.href=url;a.download=f.name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},500);},idx*150);});toast(files.length+' та расм юкланди');if(btn)btn.disabled=false;}}},'image/png',0.95);});}catch(e){toast('Хато: расм яратилмади');if(btn)btn.disabled=false;}},50);}
