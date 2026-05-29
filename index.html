@@ -307,6 +307,7 @@ body.select-mode .float-bar{display:none}
       <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="search" class="search-input" id="searchInput" placeholder="Сура ёки оят бўйича қидириш" autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
     </div>
+    <div id="refHit" class="ref-hits" aria-live="polite"></div>
     <div class="sura-grid" id="suraGrid"></div>
     <div id="verseHits" class="verse-hits" aria-live="polite"></div>
   </div>
@@ -560,14 +561,14 @@ var SURA_TYPE=['M','D','D','D','D','M','M','D','D','M','M','M','D','M','M','M','
 
 var SURA_JUZ=[1,1,3,4,6,7,8,9,10,11,11,12,13,13,14,14,15,15,16,16,17,17,18,18,18,19,19,20,20,21,21,21,21,22,22,22,23,23,23,24,24,25,25,25,25,26,26,26,26,26,26,27,27,27,27,27,27,28,28,28,28,28,28,28,28,28,29,29,29,29,29,29,29,29,29,29,29,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30];
 
-function buildGrid(q){
+function buildGrid(q,onlyNums){
   q=(q||'').toLowerCase().trim();
   var g=document.getElementById('suraGrid'),h='';
   var qa=normAr(q);
   var groups={},order=[],visible=0;
   for(var i=0;i<QD.length;i++){
     var s=QD[i];
-    var ok=!q||s._nl.indexOf(q)>=0||String(s.number).indexOf(q)>=0||(s.nameTr&&s.nameTr.toLowerCase().indexOf(q)>=0)||(qa&&s._anl&&s._anl.indexOf(qa)>=0);
+    var ok=onlyNums?onlyNums.indexOf(s.number)>=0:(!q||s._nl.indexOf(q)>=0||String(s.number).indexOf(q)>=0||(s.nameTr&&s.nameTr.toLowerCase().indexOf(q)>=0)||(qa&&s._anl&&s._anl.indexOf(qa)>=0));
     if(!ok)continue;
     visible++;
     var jz=SURA_JUZ[s.number-1];
@@ -691,7 +692,59 @@ function renderVerseHits(q){
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
   box.innerHTML=h;
 }
-function liveSearch(q){hitLimit=100;buildGrid(q);renderVerseHits(q);}
+function refNorm(s){return (s||'').toLowerCase().replace(/[^Ѐ-ӿ]/g,'');}
+function parseRef(raw){
+  var q=(raw||'').toLowerCase().trim();
+  if(q.length<2||!/[0-9]/.test(q))return null;
+  var nums=q.match(/[0-9]+/g);
+  if(!nums)return null;
+  var vnum=parseInt(nums[nums.length-1],10);
+  if(!vnum||vnum>286)return null;
+  var name=q.replace(/сураси|сура|оятларни|оятлар|оятни|ояти|оят|аят/g,' ');
+  var key=refNorm(name);
+  if(key.length<2)return null;
+  var hits=[];
+  for(var i=0;i<QD.length;i++){
+    var s=QD[i],snl=refNorm(s.name);
+    if(snl.indexOf(key)<0||vnum>s.verseCount)continue;
+    var v=null;
+    for(var j=0;j<s.verses.length;j++){if(s.verses[j].nums.indexOf(vnum)>=0){v=s.verses[j];break;}}
+    if(!v)continue;
+    hits.push({s:s,v:v,vnum:vnum,rank:snl===key?0:(snl.indexOf(key)===0?1:2)});
+  }
+  if(!hits.length)return null;
+  hits.sort(function(a,b){return a.rank-b.rank||a.s.number-b.s.number;});
+  return {key:key,vnum:vnum,hits:hits};
+}
+function renderRefHit(ref){
+  var box=document.getElementById('refHit');
+  if(!box)return;
+  if(!ref){box.innerHTML='';return;}
+  var arrow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>';
+  var h='<div class="section-label">Оятга ўтиш</div>';
+  var lim=Math.min(ref.hits.length,6);
+  for(var i=0;i<lim;i++){
+    var r=ref.hits[i];
+    var dt=r.v.text,iz=dt.indexOf('Изоҳ:');if(iz>=0)dt=dt.substring(0,iz).trim();
+    h+='<a class="ref-item" href="#/'+r.s.number+'/'+esc(r.v.label)+'" onclick="event.preventDefault();App.gotoRef('+r.s.number+',\''+esc(r.v.label)+'\')">';
+    h+='<span class="ref-arrow">'+arrow+'</span>';
+    h+='<span class="ref-body"><span class="ref-title">'+r.s.number+'. '+esc(r.s.name)+' сураси · '+r.vnum+'-оят</span>';
+    h+='<span class="ref-sub">'+esc(dt.substring(0,120))+'</span></span></a>';
+  }
+  box.innerHTML=h;
+}
+function liveSearch(q){
+  hitLimit=100;
+  var ref=parseRef(q);
+  renderRefHit(ref);
+  if(ref){
+    var nums=[];for(var i=0;i<ref.hits.length;i++)nums.push(ref.hits[i].s.number);
+    buildGrid('',nums);
+  }else{
+    buildGrid(q);
+  }
+  renderVerseHits(q);
+}
 
 function selCount(){var n=0;for(var k in selSet)if(selSet[k])n++;return n;}
 function selBar(){var b=document.getElementById('selectBar');if(!b)return;var active=selMode||hitMode;var c=hitMode?hitCount():selCount();b.classList.toggle('visible',active);var d=document.getElementById('selectCount');if(d)d.textContent=c;}
@@ -707,7 +760,7 @@ function selExit(){selMode=false;selSet={};document.body.classList.remove('selec
 function selToggle(lbl,on){var cur=!!selSet[lbl];if(on===undefined)on=!cur;if(on)selSet[lbl]=true;else delete selSet[lbl];var v=document.getElementById('v-'+lbl);if(v){v.classList.toggle('selected',on);var b=v.querySelector('.verse-num');if(b)b.classList.toggle('selected',on);}if(!selCount())selExit();else selBar();}
 function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){parts.push((v.ar?v.ar+'\n':'')+v.label+'. '+v.text);labels.push(v.label);}}if(!parts.length)return;var text=parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(parts.length+' оят нусхаси олинди');selExit();});}
 
-function goHome(){selExit();hitExit();curN=null;document.getElementById('searchInput').value='';buildGrid('');renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
+function goHome(){selExit();hitExit();curN=null;document.getElementById('searchInput').value='';buildGrid('');renderRefHit(null);renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
 
 function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
@@ -800,6 +853,7 @@ return{
   cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   cpHit:function(ev,n,lbl){if(ev&&ev.stopPropagation)ev.stopPropagation();if(longPressed){longPressed=false;return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;copyText(hitVerseText(s,v)).then(function(){toast('Нусха олинди');});},
   hitTap:function(ev,n,lbl,q){if(longPressed){longPressed=false;return;}if(hitMode){hitToggle(n,lbl);return;}openSura(n,q,lbl);},
+  gotoRef:function(n,lbl){openSura(n,'',lbl);},
   moreHits:function(){hitLimit+=100;renderVerseHits(document.getElementById('searchInput').value);},
   copyAllHits:function(){copyAllHitsDo();},
   selCancel:function(){if(hitMode)hitExit();else selExit();},
