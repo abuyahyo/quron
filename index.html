@@ -369,6 +369,26 @@ function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F
 function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
 
 function normArStrict(s){if(!s)return '';return s.replace(/\u06E1/g,'\u0652').replace(/\u0657/g,'\u064F').replace(/\u0656/g,'\u0650').replace(/\u08F0/g,'\u064B').replace(/\u08F1/g,'\u064C').replace(/\u08F2/g,'\u064D').replace(/\u0670/g,'\u0627').replace(/[\u0610-\u061A\u0653-\u0655\u0658-\u065F\u06D6-\u06E0\u06E2-\u06E8\u06EA-\u06ED\u0640\u200B-\u200F\u08D3-\u08EF\u08F3-\u08FF\uFEFF]/g,'').replace(/[\u0622\u0623\u0625\u0671]/g,'\u0627').replace(/\u0621/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0649/g,'\u0627').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A\u064B-\u0652]/g,'');}
+// True only for short vowels / tanwin the user can meaningfully distinguish
+// (fatha/damma/kasra + their tanwin). Shadda and sukun are treated as optional.
+function hasVowel(s){return /[\u064B-\u0650]/.test(s||'');}
+// Build a regex from a (partly) voweled Arabic query: each consonant must
+// appear in order; where the user typed a short vowel, that exact vowel is
+// required on that consonant; consonants left bare match regardless of vowel.
+// Matched against the strict (vowel-preserving) verse key _als.
+function arRe(q){
+  var st=normArStrict(q),H='[\u064B-\u0652\u0670]',pat='';
+  for(var k=0;k<st.length;k++){
+    var c=st.charCodeAt(k);
+    if((c>=0x64B&&c<=0x652)||c===0x670)continue;// stray mark, skip
+    var reqs='',m=k+1;
+    while(m<st.length){var d=st.charCodeAt(m);if((d>=0x64B&&d<=0x652)||d===0x670){if(d>=0x64B&&d<=0x650)reqs+='(?='+H+'*'+st.charAt(m)+')';m++;}else break;}
+    pat+=st.charAt(k)+reqs+H+'*';
+    k=m-1;
+  }
+  if(!pat)return null;
+  try{return new RegExp(pat);}catch(e){return null;}
+}
 
 for(var qi=0;qi<QD.length;qi++){
   QD[qi]._nl=QD[qi].name.toLowerCase();
@@ -695,15 +715,15 @@ function renderVerseHits(q){
   if(!box)return;
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
-  var ql=q.toLowerCase(),strict=hasHarakat(q),qa=normAr(q),qas=strict?normArStrict(q):'',vr=[];
-  var useStrict=false;
-  if(qas){for(var i=0;i<QD.length&&!useStrict;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&sv[j]._als.indexOf(qas)>=0){useStrict=true;break;}}}}
+  var ql=q.toLowerCase(),qa=normAr(q),vr=[];
+  var re=hasVowel(q)?arRe(q):null;
+  if(re){var any=false;for(var i=0;i<QD.length&&!any;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&re.test(sv[j]._als)){any=true;break;}}}if(!any)re=null;}
   for(var i=0;i<QD.length;i++){
     var s=QD[i];
     for(var j=0;j<s.verses.length;j++){
       var vv=s.verses[j];
       var mt=vv._tl.indexOf(ql)>=0;
-      var ma=useStrict?(vv._als&&vv._als.indexOf(qas)>=0):(qa&&vv._al&&vv._al.indexOf(qa)>=0);
+      var ma=re?(!!vv._als&&re.test(vv._als)):(qa&&vv._al&&vv._al.indexOf(qa)>=0);
       if(mt||ma)vr.push({s:s,v:vv,ma:ma});
     }
   }
