@@ -289,7 +289,7 @@ body.select-mode .float-bar{display:none}
   <div class="logo" onclick="App.goHome()" role="button" tabindex="0" aria-label="Бош саҳифа">
     <div><div class="logo-text">Қуръон</div><div class="logo-sub">Ўзбекча таржима</div></div>
   </div>
-  <button class="back-btn" id="backBtn" onclick="App.goHome()" aria-label="Бош саҳифа"><span class="arrow" aria-hidden="true">←</span><span>Орқага</span></button>
+  <button class="back-btn" id="backBtn" onclick="App.goBack()" aria-label="Орқага"><span class="arrow" aria-hidden="true">←</span><span>Орқага</span></button>
   <div class="header-actions">
     <a class="icon-btn" href="https://abuyahyo.github.io/otamga/" target="_blank" rel="noopener noreferrer" aria-label="Отамга — тиловат тинглаш" title="Отамга — тиловат тинглаш">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-2v-7h4z"/><path d="M3 19a2 2 0 0 0 2 2h2v-7H3z"/></svg>
@@ -361,6 +361,7 @@ var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
 var showAr=sg('ar','0')==='1';
 var copyMode=sg('cpm','both');
 var navLock=false;
+var _homeScroll=0;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
 var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[];
 
@@ -657,6 +658,8 @@ function openSura(num,hw,scrollVerse){
   hw=hw||'';
   var sura=gS(num);
   if(!sura)return;
+  var hp=document.getElementById('homePage');
+  if(hp&&hp.style.display!=='none')_homeScroll=window.scrollY;
   selExit();
   curN=num;curHw=hw;
   showPanel('sura');
@@ -845,6 +848,7 @@ function selToggle(lbl,on){var cur=!!selSet[lbl];if(on===undefined)on=!cur;if(on
 function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){var ar=(cpWantAr()&&v.ar)?v.ar:'';var uz=cpWantUz()?v.text:'';var line=ar&&uz?ar+'\n'+v.label+'. '+uz:(uz?v.label+'. '+uz:v.label+'. '+ar);parts.push(line);labels.push(v.label);}}if(!labels.length)return;var text=copyMode==='ref'?cpRefText(s,labels):parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(labels.length+' оят нусхаси олинди');selExit();});}
 
 function goHome(){selExit();hitExit();curN=null;lastRefs=[];document.getElementById('searchInput').value='';buildGrid('');renderRefHit(null);renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
+function goBack(){var q=document.getElementById('searchInput').value;if(!q||!q.trim()){goHome();return;}selExit();hitExit();curN=null;showPanel('home');setHash('');window.scrollTo(0,_homeScroll);}
 
 function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
@@ -864,7 +868,7 @@ function setHash(h){if(navLock)return;navLock=true;try{location.hash=h;}finally{
 function applyHash(){
   if(navLock)return;
   var h=location.hash.replace(/^#\/?/,'');
-  if(!h){if(curN!==null)goHome();return;}
+  if(!h){if(curN!==null)goBack();return;}
   var m=h.split('/');
   var n=parseInt(m[0],10);
   if(!n||n<1||n>114)return;
@@ -927,6 +931,7 @@ if(location.hash){applyHash();}else{showPanel('home');}
 return{
   open:openSura,
   goHome:goHome,
+  goBack:goBack,
   toggleTheme:function(){th=th==='dark'?'light':'dark';ss('th',th);apTh();},
   toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
