@@ -204,6 +204,10 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .ref-copy:hover,.ref-copy:active{background:var(--emerald-soft);color:var(--emerald)}
 .ref-copy svg{width:17px;height:17px}
 .no-results{text-align:center;padding:34px 14px;color:var(--text-muted);font-size:14px}
+.popover-row.popover-row-col{flex-direction:column;align-items:stretch;gap:9px}
+.copy-seg{display:flex;width:100%;background:var(--surface-hi);border-radius:10px;padding:3px;gap:3px}
+.copy-seg button{flex:1;padding:7px 4px;border:0;background:transparent;color:var(--text-muted);font-family:inherit;font-size:11.5px;font-weight:600;border-radius:8px;cursor:pointer;transition:background .12s,color .12s;white-space:nowrap}
+.copy-seg button.active{background:var(--emerald);color:#fff}
 .section-label{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 10px;padding:0 4px}
 .hits-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .hits-head .section-label{margin-bottom:10px}
@@ -312,6 +316,14 @@ body.select-mode .float-bar{display:none}
     <span class="popover-label">Араб матни</span>
     <button class="ar-toggle" id="arToggleBtn" type="button" onclick="App.toggleAr()" aria-label="Араб матнини кўрсатиш/яшириш"></button>
   </div>
+  <div class="popover-row popover-row-col">
+    <span class="popover-label">Нусха олиш</span>
+    <div class="copy-seg" id="copySeg" role="group" aria-label="Нусха олиш тури">
+      <button type="button" data-cm="both" onclick="App.setCopyMode('both')">Араб + ўзбек</button>
+      <button type="button" data-cm="uz" onclick="App.setCopyMode('uz')">Фақат ўзбек</button>
+      <button type="button" data-cm="ar" onclick="App.setCopyMode('ar')">Фақат араб</button>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="homePage">
@@ -346,6 +358,7 @@ function sg(k,d){try{var v=localStorage.getItem(k);return v!==null?v:d;}catch(e)
 function ss(k,v){try{localStorage.setItem(k,v);}catch(e){_s[k]=v;}}
 var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
 var showAr=sg('ar','0')==='1';
+var copyMode=sg('cpm','both');
 var navLock=false;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
 var hitMode=false,hitSel={},hitLimit=100,lastHits=[];
@@ -383,6 +396,9 @@ function hl(t,q){
   catch(e2){return s;}
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
+function cpWantAr(){return copyMode!=='uz';}
+function cpWantUz(){return copyMode!=='ar';}
+function apCopyMode(){var seg=document.getElementById('copySeg');if(!seg)return;var b=seg.querySelectorAll('button');for(var i=0;i<b.length;i++)b[i].classList.toggle('active',b[i].getAttribute('data-cm')===copyMode);}
 function apTh(){document.body.classList.toggle('light',th==='light');var ic=th==='light'?ICN.moon:ICN.sun;var btn=document.getElementById('themeBtn');if(btn)btn.innerHTML=ic;}
 function apAr(){document.body.classList.toggle('hide-ar',!showAr);var b=document.getElementById('arToggleBtn');if(b){b.innerHTML=showAr?ICN.eyeOff:ICN.eye;b.title=showAr?'Араб матнини яшириш':'Араб матнини кўрсатиш';b.classList.toggle('on',showAr);}}
 function toast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast show';clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast';},1800);}
@@ -767,13 +783,13 @@ function hitCount(){var n=0;for(var k in hitSel)if(hitSel[k])n++;return n;}
 function hitEnter(n,lbl){hitMode=true;hitSel={};document.body.classList.add('select-mode');hitToggle(n,lbl,true);}
 function hitExit(){hitMode=false;hitSel={};document.body.classList.remove('select-mode');var els=document.querySelectorAll('.result-item.selected');for(var i=0;i<els.length;i++)els[i].classList.remove('selected');selBar();}
 function hitToggle(n,lbl,on){var key=n+'|'+lbl;var cur=!!hitSel[key];if(on===undefined)on=!cur;if(on)hitSel[key]=true;else delete hitSel[key];var el=document.querySelector('.result-item[data-n="'+n+'"][data-lbl="'+lbl+'"]');if(el)el.classList.toggle('selected',on);if(!hitCount())hitExit();else selBar();}
-function hitVerseText(s,v){var m=v.text;var iz=m.indexOf('Изоҳ:');if(iz>=0)m=m.substring(0,iz).trim();return (v.ar?v.ar+'\n\n':'')+m+'\n\n('+s.name+', '+v.label+'-оят)';}
+function hitVerseText(s,v){var m=v.text;var iz=m.indexOf('Изоҳ:');if(iz>=0)m=m.substring(0,iz).trim();var ar=(cpWantAr()&&v.ar)?v.ar:'';var uz=cpWantUz()?m:'';var b=ar&&uz?ar+'\n\n'+uz:(ar||uz);return b+'\n\n('+s.name+', '+v.label+'-оят)';}
 function hitCopyDo(){var els=document.querySelectorAll('.result-item.selected');if(!els.length)return;var parts=[];for(var i=0;i<els.length;i++){var n=parseInt(els[i].dataset.n,10);var lbl=els[i].dataset.lbl;var s=gS(n);if(!s)continue;var v=null;for(var j=0;j<s.verses.length;j++)if(s.verses[j].label===lbl){v=s.verses[j];break;}if(!v)continue;parts.push(hitVerseText(s,v));}if(!parts.length)return;copyText(parts.join('\n\n')).then(function(){toast(parts.length+' оят нусхаси олинди');hitExit();});}
 function copyAllHitsDo(){if(!lastHits.length)return;var parts=[];for(var i=0;i<lastHits.length;i++)parts.push(hitVerseText(lastHits[i].s,lastHits[i].v));copyText(parts.join('\n\n')).then(function(){toast(parts.length+' оят нусхаси олинди');});}
 function selEnter(lbl){selMode=true;selSet={};selToggle(lbl,true);document.body.classList.add('select-mode');selBar();}
 function selExit(){selMode=false;selSet={};document.body.classList.remove('select-mode');var els=document.querySelectorAll('.verse.selected,.verse-num.selected');for(var i=0;i<els.length;i++)els[i].classList.remove('selected');selBar();}
 function selToggle(lbl,on){var cur=!!selSet[lbl];if(on===undefined)on=!cur;if(on)selSet[lbl]=true;else delete selSet[lbl];var v=document.getElementById('v-'+lbl);if(v){v.classList.toggle('selected',on);var b=v.querySelector('.verse-num');if(b)b.classList.toggle('selected',on);}if(!selCount())selExit();else selBar();}
-function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){parts.push((v.ar?v.ar+'\n':'')+v.label+'. '+v.text);labels.push(v.label);}}if(!parts.length)return;var text=parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(parts.length+' оят нусхаси олинди');selExit();});}
+function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){var ar=(cpWantAr()&&v.ar)?v.ar:'';var uz=cpWantUz()?v.text:'';var line=ar&&uz?ar+'\n'+v.label+'. '+uz:(uz?v.label+'. '+uz:v.label+'. '+ar);parts.push(line);labels.push(v.label);}}if(!parts.length)return;var text=parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(parts.length+' оят нусхаси олинди');selExit();});}
 
 function goHome(){selExit();hitExit();curN=null;document.getElementById('searchInput').value='';buildGrid('');renderRefHit(null);renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
 
@@ -831,7 +847,7 @@ window.addEventListener('scroll',function(){
   _lastY=y;
 },{passive:true});
 
-apTh();apFz();apAr();buildGrid('');
+apTh();apFz();apAr();apCopyMode();buildGrid('');
 
 function startPress(btn){longPressed=false;if(pressTimer)clearTimeout(pressTimer);pressTimer=setTimeout(function(){pressTimer=null;longPressed=true;if(btn.classList.contains('result-item')){var n=parseInt(btn.dataset.n,10);var hl=btn.dataset.lbl;if(!hl)return;if(!hitMode)hitEnter(n,hl);else hitToggle(n,hl);}else{var lbl=btn.dataset.lbl;if(!lbl)return;if(!selMode)selEnter(lbl);else selToggle(lbl);}if(navigator.vibrate)try{navigator.vibrate(18);}catch(e){}setTimeout(function(){longPressed=false;},120);},450);}
 function endPress(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}}
@@ -861,11 +877,12 @@ return{
   toggleTheme:function(){th=th==='dark'?'light':'dark';ss('th',th);apTh();},
   toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
+  setCopyMode:function(m){copyMode=m;ss('cpm',m);apCopyMode();var lbl=m==='uz'?'Фақат ўзбекча нусхаланади':(m==='ar'?'Фақат арабча нусхаланади':'Араб + ўзбек нусхаланади');toast(lbl);},
   iz:function(btn){var el=btn.nextElementSibling;if(!el)return;var s=el.classList.toggle('show');btn.textContent=s?'\u25b2 \u0418\u0437\u043e\u04b3\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0418\u0437\u043e\u04b3\u043d\u0438 \u043a\u045e\u0440\u0438\u0448';},
   dsc:function(btn){var el=document.getElementById('descCard');if(!el)return;var s=el.classList.toggle('show');btn.setAttribute('aria-expanded',s?'true':'false');var sp=btn.querySelector('span');if(sp)sp.textContent=s?'\u25b2 \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u044f\u0448\u0438\u0440\u0438\u0448':'\u25bc \u0422\u0430\u0432\u0441\u0438\u0444\u043d\u0438 \u045e\u049b\u0438\u0448';},
   jumpV:function(ev){if(ev)ev.preventDefault();var inp=document.getElementById('jumpInput');if(!inp||!curN)return;var n=parseInt(inp.value,10);var sura=gS(curN);if(!sura||!n||n<1||n>sura.verseCount){inp.value='';return;}var label=null;for(var i=0;i<sura.verses.length;i++){if(sura.verses[i].nums.indexOf(n)>=0){label=sura.verses[i].label;break;}}if(!label)return;var el=document.getElementById('v-'+label);if(!el)return;el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');setTimeout(function(){el.classList.remove('flash');},1500);inp.value='';inp.blur();},
   fz:function(d){fz=Math.max(13,Math.min(28,fz+d));ss('fs',fz);apFz();},
-  cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var t=(v.ar?v.ar+'\n\n':'')+v.text+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
+  cp:function(n,lbl){if(longPressed){longPressed=false;return;}if(selMode){selToggle(lbl);return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;var ar=(cpWantAr()&&v.ar)?v.ar:'';var uz=cpWantUz()?v.text:'';var b=ar&&uz?ar+'\n\n'+uz:(ar||uz);var t=b+'\n\n('+s.name+', '+lbl+'-оят)';copyText(t).then(function(){toast('Нусха олинди');});},
   cpHit:function(ev,n,lbl){if(ev&&ev.stopPropagation)ev.stopPropagation();if(longPressed){longPressed=false;return;}var s=gS(n);if(!s)return;var v=null;for(var i=0;i<s.verses.length;i++)if(s.verses[i].label===lbl){v=s.verses[i];break;}if(!v)return;copyText(hitVerseText(s,v)).then(function(){toast('Нусха олинди');});},
   hitTap:function(ev,n,lbl,q){if(longPressed){longPressed=false;return;}if(hitMode){hitToggle(n,lbl);return;}openSura(n,q,lbl);},
   gotoRef:function(n,lbl){openSura(n,'',lbl);},
