@@ -747,7 +747,10 @@ function renderVerseHits(q){
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
   box.innerHTML=h;
 }
-function refNorm(s){return (s||'').toLowerCase().replace(/[^Ѐ-ӿ]/g,'');}
+function refNorm(s){return (s||'').toLowerCase().replace(/[^Ѐ-ӿ]/g,'').replace(/\u049B/g,'\u043A').replace(/\u0493/g,'\u0433').replace(/\u04B3/g,'\u0445').replace(/\u045E/g,'\u0443').replace(/[\u044A\u044C]/g,'');}
+// edit distance <= 1 (one substitution/insertion/deletion), for forgiving
+// sura-name matching (e.g. \u043d\u0438\u0441\u0430 vs \u043d\u0438\u0441\u043e).
+function ed1(a,b){var la=a.length,lb=b.length;if(Math.abs(la-lb)>1)return false;if(a===b)return true;var i=0,j=0,d=0;while(i<la&&j<lb){if(a[i]===b[j]){i++;j++;}else{if(++d>1)return false;if(la>lb)i++;else if(lb>la)j++;else{i++;j++;}}}if(i<la||j<lb)d++;return d<=1;}
 function parseSeg(seg,bestOnly){
   seg=(seg||'').toLowerCase().trim();
   if(seg.length<2||!/[0-9]/.test(seg))return [];
@@ -762,6 +765,7 @@ function parseSeg(seg,bestOnly){
     if(snl.indexOf(key)<0)continue;
     suras.push({s:s,rank:snl===key?0:(snl.indexOf(key)===0?1:2)});
   }
+  if(!suras.length){for(var i=0;i<QD.length;i++){var s=QD[i],snl=refNorm(s.name);if(ed1(snl,key))suras.push({s:s,rank:3});}}
   if(!suras.length)return [];
   suras.sort(function(a,b){return a.rank-b.rank||a.s.number-b.s.number;});
   var out=[];
@@ -783,7 +787,7 @@ function parseSeg(seg,bestOnly){
 function parseRef(raw){
   var q=(raw||'').toLowerCase().trim();
   if(q.length<2||!/[0-9]/.test(q))return null;
-  var segs=q.split(/[*;\n\u2022\t]+/);
+  var segs=q.replace(/(оят|аят)/g,'$1\u0001').split(/[*;\n\u2022\t\u0001]+/);
   var clean=[];for(var i=0;i<segs.length;i++){var t=segs[i].replace(/^[\s,.-]+|[\s,.-]+$/g,'');if(t.length)clean.push(t);}
   var multiSeg=clean.length>1;
   var all=[];
