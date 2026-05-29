@@ -695,14 +695,13 @@ function renderVerseHits(q){
   if(!box)return;
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
-  var ql=q.toLowerCase(),strict=hasHarakat(q),qa=strict?normArStrict(q):normAr(q),vr=[];
+  var ql=q.toLowerCase(),strict=hasHarakat(q),qa=normAr(q),qas=strict?normArStrict(q):'',vr=[];
   for(var i=0;i<QD.length;i++){
     var s=QD[i];
     for(var j=0;j<s.verses.length;j++){
       var vv=s.verses[j];
       var mt=vv._tl.indexOf(ql)>=0;
-      var aField=strict?vv._als:vv._al;
-      var ma=qa&&aField&&aField.indexOf(qa)>=0;
+      var ma=(qa&&vv._al&&vv._al.indexOf(qa)>=0)||(qas&&vv._als&&vv._als.indexOf(qas)>=0);
       if(mt||ma)vr.push({s:s,v:vv,ma:ma});
     }
   }
