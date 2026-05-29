@@ -192,6 +192,10 @@ body.hide-ar .verse-ar,body.hide-ar .sura-pg-title-ar{display:none}
 .hits-more:hover,.hits-more:active{background:var(--surface-hi);border-color:var(--emerald)}
 .ar-sug{display:block;width:100%;margin-top:12px;padding:13px;text-align:center;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--emerald);background:var(--emerald-soft);border:1px solid var(--emerald);border-radius:12px;cursor:pointer;transition:background .12s}
 .ar-sug:hover,.ar-sug:active{background:var(--surface-hi)}
+.jannah-sug{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:14px;font-family:inherit;font-size:14px;font-weight:700;color:var(--gold);background:var(--gold-soft);border:1px solid var(--gold);border-radius:14px;cursor:pointer;transition:background .15s,transform .1s;box-shadow:var(--glass-edge-soft)}
+.jannah-sug:hover{background:rgba(212,168,67,0.2)}
+.jannah-sug:active{transform:scale(.99)}
+.jannah-ic{color:var(--gold);font-size:15px}
 .ref-hits{margin-top:14px;display:flex;flex-direction:column;gap:8px}
 .ref-hits:empty{display:none}
 .ref-item{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--emerald);box-shadow:0 0 0 2px var(--emerald-soft),var(--glass-edge-soft);cursor:pointer;text-decoration:none;color:inherit;transition:transform .1s,background .12s}
@@ -365,11 +369,19 @@ var copyMode=sg('cpm','both');
 var navLock=false;
 var _homeScroll=0;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
-var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[],arStrip=false;
+var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[],arStrip=false,jannahMode=false;
 
 function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 function normArNoAl(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/g,'$1$2').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 function hasAl(q){return /(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/.test((q||'').replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED\u0670]/g,''));}
+// --- Jannah (paradise) thematic search ---
+// Alif-preserving normalization (so عالية != عليه); dagger-alif -> alif.
+function normJ(s){if(!s)return '';return s.replace(/\u0670/g,'\u0627').replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0622\u0623\u0625\u0671]/g,'\u0627').replace(/\u0621/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0649/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
+// Quranic names/descriptions of paradise (root/phrase forms).
+var JANNAH_RAW=['الْجَنَّة','جَنَّات','الْفِرْدَوْس','دَارُ السَّلَام','دَارَ الْمُقَامَة','مَقَامٍ أَمِين','الْحُسْنَى','الْغُرْفَة','الْغُرَف','الْحَيَوَان','مَقْعَدِ صِدْق','ظِلّ مَمْدُود','عَيْن جَارِيَة','رَوْضَات','ظِلَال وَعُيون','قُرَّةِ أَعْيُن','عَالِيَة','مَفَازًا','عَاقِبَةُ الدَّار','مُبَوَّأَ صِدْق'];
+var JANNAH_KEYS=(function(){var o=[],seen={};for(var i=0;i<JANNAH_RAW.length;i++){var k=normJ(JANNAH_RAW[i]);if(k&&!seen[k]){seen[k]=1;o.push(k);}}return o;})();
+function jannahTrig(q){if(!q)return false;var u=q.toLowerCase();if(/жаннат|фирдавс|адн/.test(u))return true;var j=normJ(q);if(j.length<2)return false;for(var i=0;i<JANNAH_KEYS.length;i++){var k=JANNAH_KEYS[i];if(k.indexOf(j)>=0||j.indexOf(k)>=0)return true;}return false;}
+function jannahHits(){var vr=[];for(var i=0;i<QD.length;i++){var s=QD[i];for(var j=0;j<s.verses.length;j++){var vv=s.verses[j];if(!vv.ar)continue;var vn=vv._jn;if(vn===undefined){vn=vv._jn=normJ(vv.ar);}for(var k=0;k<JANNAH_KEYS.length;k++){if(vn.indexOf(JANNAH_KEYS[k])>=0){vr.push({s:s,v:vv,ma:true});break;}}}}return vr;}
 
 function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
 
@@ -723,21 +735,27 @@ function renderVerseHits(q){
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
   var ql=q.toLowerCase(),qa=normAr(q),qan=arStrip?normArNoAl(q):'',vr=[];
-  var re=(!arStrip&&hasVowel(q))?arRe(q):null;
-  if(re){var any=false;for(var i=0;i<QD.length&&!any;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&re.test(sv[j]._als)){any=true;break;}}}if(!any)re=null;}
-  for(var i=0;i<QD.length;i++){
-    var s=QD[i];
-    for(var j=0;j<s.verses.length;j++){
-      var vv=s.verses[j];
-      var mt=vv._tl.indexOf(ql)>=0;
-      var ma=arStrip?(qan&&vv.ar&&normArNoAl(vv.ar).indexOf(qan)>=0):(re?(!!vv._als&&re.test(vv._als)):(qa&&vv._al&&vv._al.indexOf(qa)>=0));
-      if(mt||ma)vr.push({s:s,v:vv,ma:ma});
+  if(jannahMode){
+    vr=jannahHits();
+  }else{
+    var re=(!arStrip&&hasVowel(q))?arRe(q):null;
+    if(re){var any=false;for(var i=0;i<QD.length&&!any;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&re.test(sv[j]._als)){any=true;break;}}}if(!any)re=null;}
+    for(var i=0;i<QD.length;i++){
+      var s=QD[i];
+      for(var j=0;j<s.verses.length;j++){
+        var vv=s.verses[j];
+        var mt=vv._tl.indexOf(ql)>=0;
+        var ma=arStrip?(qan&&vv.ar&&normArNoAl(vv.ar).indexOf(qan)>=0):(re?(!!vv._als&&re.test(vv._als)):(qa&&vv._al&&vv._al.indexOf(qa)>=0));
+        if(mt||ma)vr.push({s:s,v:vv,ma:ma});
+      }
     }
   }
-  var sugAl=!arStrip&&qa&&hasAl(q);
-  if(!vr.length){lastHits=[];box.innerHTML=sugAl?('<button type="button" class="ar-sug" onclick="App.arStrip()">\u0410\u0440\u0442\u0438\u043a\u043b\u0441\u0438\u0437 \u049b\u0438\u0434\u0438\u0440\u0438\u0431 \u043a\u045e\u0440\u0438\u0448</button>'):'';return;}
+  var sugAl=!arStrip&&!jannahMode&&qa&&hasAl(q);
+  var sugJ=!jannahMode&&jannahTrig(q);
+  var jBtn='<button type="button" class="jannah-sug" onclick="App.jannah()"><span class="jannah-ic">✦</span> Жаннатнинг барча номлари бўйича қидириш</button>';
+  if(!vr.length){lastHits=[];box.innerHTML=(sugAl?('<button type="button" class="ar-sug" onclick="App.arStrip()">\u0410\u0440\u0442\u0438\u043a\u043b\u0441\u0438\u0437 \u049b\u0438\u0434\u0438\u0440\u0438\u0431 \u043a\u045e\u0440\u0438\u0448</button>'):'')+(sugJ?jBtn:'');return;}
   lastHits=vr;
-  var h='<div class="hits-head"><div class="section-label">Оятларда топилди ('+vr.length+' та)</div>';
+  var h='<div class="hits-head"><div class="section-label">'+(jannahMode?'Жаннат ҳақидаги оятлар':'Оятларда топилди')+' ('+vr.length+' та)</div>';
   h+='<button type="button" class="hits-copy-all" onclick="App.copyAllHits()" aria-label="Барча натижаларни нусхалаш" title="Барчасини нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Барчаси</span></button></div>';
   var lim=Math.min(vr.length,hitLimit);
   for(var i=0;i<lim;i++){
@@ -751,6 +769,7 @@ function renderVerseHits(q){
   }
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
   if(sugAl)h+='<button type="button" class="ar-sug" onclick="App.arStrip()">\u0410\u0440\u0442\u0438\u043a\u043b\u0441\u0438\u0437 \u04b3\u0430\u043c \u049b\u0438\u0434\u0438\u0440\u0438\u0448</button>';
+  if(sugJ)h+=jBtn;
   box.innerHTML=h;
 }
 function refNorm(s){return (s||'').toLowerCase().replace(/[^Ѐ-ӿ]/g,'').replace(/\u049B/g,'\u043A').replace(/\u0493/g,'\u0433').replace(/\u04B3/g,'\u0445').replace(/\u045E/g,'\u0443').replace(/[\u044A\u044C]/g,'');}
@@ -830,7 +849,7 @@ function renderRefHit(ref){
   box.innerHTML=h;
 }
 function liveSearch(q){
-  hitLimit=100;arStrip=false;
+  hitLimit=100;arStrip=false;jannahMode=false;
   var ref=parseRef(q);
   lastRefs=ref?ref.hits:[];
   renderRefHit(ref);
@@ -958,6 +977,7 @@ return{
   cpRefAll:function(ev){if(ev){ev.preventDefault();ev.stopPropagation();}if(!lastRefs.length)return;var parts=[];for(var i=0;i<lastRefs.length;i++)parts.push(hitVerseText(lastRefs[i].s,lastRefs[i].v));copyText(parts.join('\n\n')).then(function(){toast(parts.length+' оят нусхаси олинди');});},
   moreHits:function(){hitLimit+=100;renderVerseHits(document.getElementById('searchInput').value);},
   arStrip:function(){arStrip=true;hitLimit=100;renderVerseHits(document.getElementById('searchInput').value);},
+  jannah:function(){jannahMode=true;hitLimit=100;renderVerseHits(document.getElementById('searchInput').value);window.scrollTo({top:0,behavior:'smooth'});},
   copyAllHits:function(){copyAllHitsDo();},
   selCancel:function(){if(hitMode)hitExit();else selExit();},
   selCopy:function(){if(hitMode)hitCopyDo();else selCopyDo();},
