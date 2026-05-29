@@ -365,7 +365,7 @@ var _homeScroll=0;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
 var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[];
 
-function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
+function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/g,'$1$2').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0629/g,'\u0647').replace(/[^\u0627-\u064A]/g,'');}
 
 function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
 
