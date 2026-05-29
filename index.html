@@ -696,12 +696,14 @@ function renderVerseHits(q){
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
   var ql=q.toLowerCase(),strict=hasHarakat(q),qa=normAr(q),qas=strict?normArStrict(q):'',vr=[];
+  var useStrict=false;
+  if(qas){for(var i=0;i<QD.length&&!useStrict;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&sv[j]._als.indexOf(qas)>=0){useStrict=true;break;}}}}
   for(var i=0;i<QD.length;i++){
     var s=QD[i];
     for(var j=0;j<s.verses.length;j++){
       var vv=s.verses[j];
       var mt=vv._tl.indexOf(ql)>=0;
-      var ma=(qa&&vv._al&&vv._al.indexOf(qa)>=0)||(qas&&vv._als&&vv._als.indexOf(qas)>=0);
+      var ma=useStrict?(vv._als&&vv._als.indexOf(qas)>=0):(qa&&vv._al&&vv._al.indexOf(qa)>=0);
       if(mt||ma)vr.push({s:s,v:vv,ma:ma});
     }
   }
