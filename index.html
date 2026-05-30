@@ -249,6 +249,18 @@ body.select-mode .float-bar{display:none}
 
 .select-bar{position:fixed;bottom:18px;left:50%;transform:translate(-50%,90px);background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:28px;display:none;align-items:center;gap:4px;padding:5px 6px 5px 5px;z-index:57;box-shadow:var(--glass-shadow),var(--glass-edge);opacity:0;transition:transform .25s ease,opacity .25s ease}
 .select-bar.visible{display:flex;transform:translate(-50%,0);opacity:1}
+.install-banner{position:fixed;left:16px;right:16px;bottom:16px;max-width:480px;margin:0 auto;z-index:120;display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:16px;background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow),var(--glass-edge);animation:install-slide-up .4s cubic-bezier(.16,1,.3,1)}
+.install-banner[hidden]{display:none}
+.install-banner-icon{flex:0 0 auto;width:44px;height:44px;border-radius:12px;object-fit:cover;box-shadow:var(--shadow-sm)}
+.install-banner-text{flex:1;min-width:0}
+.install-banner-text strong{display:block;font-size:14.5px;font-weight:700;color:var(--text);line-height:1.25}
+.install-banner-text p{margin:2px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-muted)}
+#install-banner-action{flex:0 0 auto;background:var(--emerald);color:#fff;border:0;font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:999px;cursor:pointer;transition:background .15s,transform .1s}
+#install-banner-action:hover{background:var(--emerald-bright)}#install-banner-action:active{transform:scale(.96)}
+#install-banner-close{flex:0 0 auto;background:transparent;border:0;color:var(--text-muted);font-size:16px;line-height:1;padding:6px;border-radius:8px;cursor:pointer;transition:background .12s,color .12s}
+#install-banner-close:hover{background:var(--surface-hi);color:var(--text)}
+@keyframes install-slide-up{from{transform:translateY(120%)}to{transform:translateY(0)}}
+@media (max-width:480px){.install-banner{gap:11px;padding:11px 12px}.install-banner-icon{width:40px;height:40px}.install-banner-text strong{font-size:13.5px}.install-banner-text p{font-size:11.5px}#install-banner-action{padding:8px 15px;font-size:13px}}
 .sb-btn{background:transparent;border:0;color:var(--text-dim);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;font-family:inherit;transition:background .12s,color .12s}
 .sb-btn:hover,.sb-btn:active{background:var(--surface-hi);color:var(--text)}
 .sb-btn svg{width:18px;height:18px}
@@ -366,6 +378,15 @@ body.select-mode .float-bar{display:none}
   <button type="button" class="sb-btn" id="sbCancel" onclick="App.selCancel()" aria-label="Танлашни бекор қилиш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   <span class="sb-count"><span id="selectCount">0</span> танланди</span>
   <button type="button" class="sb-btn sb-copy" onclick="App.selCopy()" aria-label="Танланган оятларни нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Нусхалаш</span></button>
+</div>
+<div class="install-banner" id="install-banner" hidden role="dialog" aria-label="Иловани ўрнатиш">
+  <img src="icon-192.png" alt="" class="install-banner-icon">
+  <div class="install-banner-text">
+    <strong>Иловани ўрнатиш</strong>
+    <p>Ушбу иловани телефонингизга ўрнатинг — оффлайн ҳам ишлайди.</p>
+  </div>
+  <button id="install-banner-action">Ўрнатиш</button>
+  <button id="install-banner-close" aria-label="Йопиш">✕</button>
 </div>
 <script src="data.js?v=20260529b"></script>
 <script>
@@ -1023,6 +1044,24 @@ return{
 document.addEventListener('touchmove',function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});
 
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(reg){if(reg)reg.update().catch(function(){});}).catch(function(){});});}
+
+// --- PWA install banner ---
+(function(){
+  var KEY='quron_install_dismissed_at',TTL=14*24*60*60*1000;
+  var deferred=null;
+  var banner=document.getElementById('install-banner');
+  var action=document.getElementById('install-banner-action');
+  var closeb=document.getElementById('install-banner-close');
+  if(!banner||!action||!closeb)return;
+  function dismissed(){try{var t=Number(localStorage.getItem(KEY)||0);return t&&(Date.now()-t<TTL);}catch(e){return false;}}
+  function standalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+  function show(){if(standalone()||dismissed())return;banner.hidden=false;}
+  function hide(){banner.hidden=true;}
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;show();});
+  window.addEventListener('appinstalled',function(){deferred=null;hide();});
+  action.addEventListener('click',function(){if(!deferred){hide();return;}hide();try{deferred.prompt();deferred.userChoice.catch(function(){});}catch(e){}deferred=null;});
+  closeb.addEventListener('click',function(){try{localStorage.setItem(KEY,String(Date.now()));}catch(e){}hide();});
+})();
 
 </script>
 </body>

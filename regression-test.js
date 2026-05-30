@@ -101,6 +101,15 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await pg.click('#themeBtn'); await pg.waitForTimeout(200);
   ok('dark theme back', !(await pg.$eval('body',e=>e.classList.contains('light'))));
 
+  console.log('=== 12. PWA INSTALL BANNER ===');
+  ok('banner hidden by default', (await pg.$eval('#install-banner',e=>e.hidden)));
+  await pg.evaluate(()=>{var e=new Event('beforeinstallprompt');e.prompt=function(){};e.userChoice=Promise.resolve({});window.dispatchEvent(e);});
+  await pg.waitForTimeout(200);
+  ok('banner shows on beforeinstallprompt', !(await pg.$eval('#install-banner',e=>e.hidden)));
+  await pg.click('#install-banner-close'); await pg.waitForTimeout(150);
+  ok('banner closes + persists dismiss', (await pg.$eval('#install-banner',e=>e.hidden)) && !!(await pg.evaluate(()=>localStorage.getItem('quron_install_dismissed_at'))));
+  await pg.evaluate(()=>localStorage.removeItem('quron_install_dismissed_at'));
+
   console.log('\n=== RESULT ===');
   console.log('PASS:',pass,' FAIL:',fail);
   console.log('CONSOLE ERRORS:', errors.length?JSON.stringify(errors):'none');
