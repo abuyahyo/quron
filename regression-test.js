@@ -110,6 +110,15 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   ok('banner closes + persists dismiss', (await pg.$eval('#install-banner',e=>e.hidden)) && !!(await pg.evaluate(()=>localStorage.getItem('quron_install_dismissed_at'))));
   await pg.evaluate(()=>localStorage.removeItem('quron_install_dismissed_at'));
 
+  console.log('=== 13. NO-RESULTS GATING ===');
+  await fill('فمن عفي له');
+  ok('arabic-only verse match hides "nothing found"',
+     (await hits())>=1 && (await pg.$$eval('#suraGrid .no-results',e=>e.length))===0);
+  await fill('zzqxqx');
+  ok('true miss still shows "nothing found"',
+     (await pg.$$eval('#suraGrid .no-results',e=>e.length))===1 && (await hits())===0);
+  await fill('');
+
   console.log('\n=== RESULT ===');
   console.log('PASS:',pass,' FAIL:',fail);
   console.log('CONSOLE ERRORS:', errors.length?JSON.stringify(errors):'none');
