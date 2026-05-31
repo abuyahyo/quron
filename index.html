@@ -690,7 +690,7 @@ function buildGrid(q,onlyNums){
     if(!groups[jz]){groups[jz]=[];order.push(jz);}
     groups[jz].push(s);
   }
-  if(!visible){g.innerHTML='<div class="no-results">\u04b2\u0435\u0447 \u043d\u0430\u0440\u0441\u0430 \u0442\u043e\u043f\u0438\u043b\u043c\u0430\u0434\u0438</div>';return;}
+  if(!visible){g.innerHTML='';return 0;}
   for(var ji=0;ji<order.length;ji++){
     var jz=order[ji];
     h+='<div class="juz-section">';
@@ -715,6 +715,7 @@ function buildGrid(q,onlyNums){
     h+='</div></div>';
   }
   g.innerHTML=h;
+  return visible;
 }
 
 function openSura(num,hw,scrollVerse){
@@ -906,13 +907,19 @@ function liveSearch(q){
   var ref=parseRef(q);
   lastRefs=ref?ref.hits:[];
   renderRefHit(ref);
+  var visible;
   if(ref){
     var nums=[];for(var i=0;i<ref.hits.length;i++)nums.push(ref.hits[i].s.number);
-    buildGrid('',nums);
+    visible=buildGrid('',nums);
   }else{
-    buildGrid(q);
+    visible=buildGrid(q);
   }
   renderVerseHits(q);
+  // Only declare "nothing found" when the sura grid, verse hits AND verse-ref
+  // hits are all empty — an Arabic/verse-only match must not trip it.
+  if(q&&!visible&&!lastHits.length&&!lastRefs.length){
+    document.getElementById('suraGrid').innerHTML='<div class="no-results">Ҳеч нарса топилмади</div>';
+  }
 }
 
 function selCount(){var n=0;for(var k in selSet)if(selSet[k])n++;return n;}
