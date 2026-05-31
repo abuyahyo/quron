@@ -637,9 +637,11 @@ function drawDescPages(sura){
       var stype=SURA_TYPE_ARR[sura.number-1]==='M'?'МАККА':'МАДИНА';
       drawPill(ctx,'СУРА '+sura.number+' · '+stype+' · '+sura.verseCount+' ОЯТ',mx,130,light);
       ctx.fillStyle=txtColor;
-      ctx.font='800 90px '+SANS;
+      var titleTxt=sura.name+' сураси',titleSize=90;
+      ctx.font='800 '+titleSize+'px '+SANS;
+      while(titleSize>54&&ctx.measureText(titleTxt).width>maxW){titleSize-=2;ctx.font='800 '+titleSize+'px '+SANS;}
       ctx.textBaseline='alphabetic';ctx.textAlign='left';
-      ctx.fillText(sura.name+' сураси',mx,360);
+      ctx.fillText(titleTxt,mx,360);
       bodyTop=p1BodyTop;bodyBottom=p1BodyBottom;
     }else{
       drawPill(ctx,sura.name+' сураси',mx,130,light);
