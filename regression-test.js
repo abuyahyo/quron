@@ -119,6 +119,15 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
      (await pg.$$eval('#suraGrid .no-results',e=>e.length))===1 && (await hits())===0);
   await fill('');
 
+  console.log('=== 14. SEARCH CLEAR BUTTON ===');
+  ok('clear button hidden when empty', (await pg.$eval('#searchClear',e=>e.hidden)));
+  await fill('раҳмон');
+  ok('clear button visible with text', !(await pg.$eval('#searchClear',e=>e.hidden)));
+  await pg.click('#searchClear'); await pg.waitForTimeout(300);
+  ok('clear empties input, restores grid, hides button',
+     (await pg.inputValue('#searchInput'))==='' && (await grid()).length===114
+     && (await hits())===0 && (await pg.$eval('#searchClear',e=>e.hidden)));
+
   console.log('\n=== RESULT ===');
   console.log('PASS:',pass,' FAIL:',fail);
   console.log('CONSOLE ERRORS:', errors.length?JSON.stringify(errors):'none');

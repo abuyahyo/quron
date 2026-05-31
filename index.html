@@ -108,10 +108,15 @@ header.in-page .logo{display:none}
 .sura-grid-wrap{max-width:720px;margin:0 auto;padding:0 16px 48px}
 
 .home-search{position:relative;padding:18px 0 14px}
-.home-search .search-input{width:100%;height:46px;font-family:inherit;font-size:15px;padding:0 16px 0 44px;background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--border);border-radius:14px;color:var(--text);outline:none;box-shadow:var(--glass-shadow),var(--glass-edge-soft);transition:border-color .15s,box-shadow .15s,background .15s}
+.home-search .search-input{width:100%;height:46px;font-family:inherit;font-size:15px;padding:0 44px 0 44px;background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--border);border-radius:14px;color:var(--text);outline:none;box-shadow:var(--glass-shadow),var(--glass-edge-soft);transition:border-color .15s,box-shadow .15s,background .15s}
+.home-search .search-input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 .home-search .search-input:focus{border-color:var(--emerald);box-shadow:0 0 0 3px var(--emerald-soft),var(--glass-shadow)}
 .home-search .search-input::placeholder{color:var(--text-muted)}
 .home-search .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text-muted);pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;padding:0;background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:9px;transition:background .12s,color .12s}
+.search-clear[hidden]{display:none}
+.search-clear:hover,.search-clear:active{background:var(--surface-hi);color:var(--text)}
+.search-clear svg{width:18px;height:18px}
 
 .sura-grid{display:flex;flex-direction:column;gap:22px;padding-top:4px}
 .juz-section{display:flex;flex-direction:column}
@@ -361,6 +366,7 @@ body.select-mode .float-bar{display:none}
     <div class="home-search" role="search">
       <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="search" class="search-input" id="searchInput" placeholder="Сура ёки оят бўйича қидириш" autocomplete="off" aria-label="Сура ёки оят бўйича қидириш">
+      <button type="button" class="search-clear" id="searchClear" onclick="App.clearSearch()" aria-label="Қидирувни тозалаш" title="Тозалаш" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div id="refHit" class="ref-hits" aria-live="polite"></div>
     <div class="sura-grid" id="suraGrid"></div>
@@ -936,8 +942,9 @@ function selExit(){selMode=false;selSet={};document.body.classList.remove('selec
 function selToggle(lbl,on){var cur=!!selSet[lbl];if(on===undefined)on=!cur;if(on)selSet[lbl]=true;else delete selSet[lbl];var v=document.getElementById('v-'+lbl);if(v){v.classList.toggle('selected',on);var b=v.querySelector('.verse-num');if(b)b.classList.toggle('selected',on);}if(!selCount())selExit();else selBar();}
 function selCopyDo(){if(!curN||!selMode)return;var s=gS(curN);if(!s)return;var parts=[],labels=[];for(var i=0;i<s.verses.length;i++){var v=s.verses[i];if(selSet[v.label]){var ar=(cpWantAr()&&v.ar)?v.ar:'';var uz=cpWantUz()?v.text:'';var line=ar&&uz?ar+'\n'+v.label+'. '+uz:(uz?v.label+'. '+uz:v.label+'. '+ar);parts.push(line);labels.push(v.label);}}if(!labels.length)return;var text=copyMode==='ref'?cpRefText(s,labels):parts.join('\n\n')+'\n\n('+s.name+' сураси, '+labels.join(', ')+'-оят)';copyText(text).then(function(){toast(labels.length+' оят нусхаси олинди');selExit();});}
 
-function goHome(){selExit();hitExit();curN=null;lastRefs=[];document.getElementById('searchInput').value='';buildGrid('');renderRefHit(null);renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
-function goBack(){var q=document.getElementById('searchInput').value;if(!q||!q.trim()){goHome();return;}selExit();hitExit();curN=null;showPanel('home');setHash('');window.scrollTo(0,_homeScroll);}
+function apClear(){var i=document.getElementById('searchInput'),c=document.getElementById('searchClear');if(c)c.hidden=!(i&&i.value);}
+function goHome(){selExit();hitExit();curN=null;lastRefs=[];document.getElementById('searchInput').value='';apClear();buildGrid('');renderRefHit(null);renderVerseHits('');showPanel('home');window.scrollTo(0,0);setHash('');}
+function goBack(){var q=document.getElementById('searchInput').value;if(!q||!q.trim()){goHome();return;}selExit();hitExit();curN=null;showPanel('home');setHash('');window.scrollTo(0,_homeScroll);apClear();}
 
 function showPanel(p){
   document.getElementById('homePage').style.display=p==='home'?'block':'none';
@@ -974,6 +981,7 @@ function closeSettings(){
 
 document.getElementById('searchInput').addEventListener('input',function(e){
   clearTimeout(sT);var v=e.target.value.trim();
+  apClear();
   sT=setTimeout(function(){liveSearch(v);},200);
 });
 
@@ -997,7 +1005,7 @@ function _walkLat(root){var w=document.createTreeWalker(root,NodeFilter.SHOW_TEX
 function _restore(root){var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null);var n;while((n=w.nextNode())){var o=_ORIG.get(n);if(o!==undefined)n.nodeValue=o;}}
 var _ORIG=new WeakMap(),_scrObs=null;
 function applyScript(){var lat=scriptMode==='lat';document.body.classList.toggle('lat-script',lat);if(_scrObs){_scrObs.disconnect();_scrObs=null;}if(lat){_walkLat(document.body);_scrObs=new MutationObserver(function(muts){if(scriptMode!=='lat')return;for(var i=0;i<muts.length;i++){var m=muts[i];for(var j=0;j<m.addedNodes.length;j++){var nd=m.addedNodes[j];if(nd.nodeType===1)_walkLat(nd);else if(nd.nodeType===3&&_CYR.test(nd.nodeValue)){var pn=nd.parentNode;if(pn&&pn.closest('[dir="rtl"],[lang="ar"],.verse-ar,.result-text-ar,.sura-pg-title-ar,.card-name-ar,.sura-pg-bismillah,input,textarea')){}else{if(_ORIG.get(nd)===undefined)_ORIG.set(nd,nd.nodeValue);nd.nodeValue=cyr2lat(nd.nodeValue);}}}}});_scrObs.observe(document.body,{childList:true,subtree:true});}else{_restore(document.body);}var ph=document.getElementById('searchInput');if(ph)ph.placeholder=lat?"Sura yoki oyat bo'yicha qidirish":'\u0421\u0443\u0440\u0430 \u0451\u043a\u0438 \u043e\u044f\u0442 \u0431\u045e\u0439\u0438\u0447\u0430 \u049b\u0438\u0434\u0438\u0440\u0438\u0448';try{document.title=lat?"Qur'oni Karim — O'zbekcha izohli tarjima":'\u049a\u0443\u0440\u044a\u043e\u043d\u0438 \u041a\u0430\u0440\u0438\u043c \u2014 \u040e\u0437\u0431\u0435\u043a\u0447\u0430 \u0438\u0437\u043e\u04b3\u043b\u0438 \u0442\u0430\u0440\u0436\u0438\u043c\u0430';}catch(e){}var b=document.getElementById('scrCyr'),l=document.getElementById('scrLat');if(b)b.classList.toggle('active',!lat);if(l)l.classList.toggle('active',lat);}
-apTh();apFz();apAr();apCopyMode();buildGrid('');applyScript();
+apTh();apFz();apAr();apCopyMode();buildGrid('');applyScript();apClear();
 
 function startPress(btn){longPressed=false;if(pressTimer)clearTimeout(pressTimer);pressTimer=setTimeout(function(){pressTimer=null;longPressed=true;if(btn.classList.contains('result-item')){var n=parseInt(btn.dataset.n,10);var hl=btn.dataset.lbl;if(!hl)return;if(!hitMode)hitEnter(n,hl);else hitToggle(n,hl);}else{var lbl=btn.dataset.lbl;if(!lbl)return;if(!selMode)selEnter(lbl);else selToggle(lbl);}if(navigator.vibrate)try{navigator.vibrate(18);}catch(e){}setTimeout(function(){longPressed=false;},120);},450);}
 function endPress(){if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}}
@@ -1025,6 +1033,7 @@ return{
   open:openSura,
   goHome:goHome,
   goBack:goBack,
+  clearSearch:function(){var i=document.getElementById('searchInput');if(!i)return;i.value='';liveSearch('');apClear();i.focus();},
   toggleTheme:function(){th=th==='dark'?'light':'dark';ss('th',th);apTh();},
   toggleSettings:function(ev){if(ev)ev.stopPropagation();var p=document.getElementById('settingsPop');var b=document.getElementById('settingsBtn');var open=!p.classList.contains('show');p.classList.toggle('show',open);b.setAttribute('aria-expanded',open?'true':'false');},
   toggleAr:function(){showAr=!showAr;ss('ar',showAr?'1':'0');apAr();},
