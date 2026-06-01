@@ -882,12 +882,17 @@ function renderVerseHits(q){
   var lim=Math.min(vr.length,hitLimit);
   for(var i=0;i<lim;i++){
     var r=vr[i];
-    var dt=r.v.text;var iz=dt.indexOf('Изоҳ:');if(iz>=0)dt=dt.substring(0,iz).trim();
+    var full=r.v.text,iz=full.indexOf('Изоҳ:'),dt=iz>=0?full.substring(0,iz).trim():full;
+    // The card hides the "Изоҳ:" note, but search indexes the full text — so a
+    // match living only in the note would show no highlight. Snippet from the
+    // full text in that case so the matched word is still visible.
+    var src=dt;
+    if(!r.ma&&q){var qx=q.toLowerCase();if(dt.toLowerCase().indexOf(qx)<0&&full.toLowerCase().indexOf(qx)>=0)src=full;}
     h+='<div class="result-item" data-n="'+r.s.number+'" data-lbl="'+esc(r.v.label)+'" onclick="App.hitTap(event,'+r.s.number+',\''+esc(r.v.label)+'\',\''+esc(q)+'\')">';
     h+='<div class="result-head"><div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-оят</div>';
     h+='<button type="button" class="result-copy" onclick="App.cpHit(event,'+r.s.number+',\''+esc(r.v.label)+'\')" aria-label="Оятни нусхалаш" title="Нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>';
     if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar.substring(0,260),q)+'</div>';
-    var sn=snip(dt,q,260);
+    var sn=snip(src,q,260);
     h+='<div class="result-text">'+(sn.pre?'… ':'')+hl(sn.s,q)+(sn.post?' …':'')+'</div></div>';
   }
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';

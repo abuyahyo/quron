@@ -45,6 +45,15 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
     return {marks:t.querySelectorAll('mark').length,pre:t.textContent.trim().startsWith('…')};
   });
   ok('long verse 2:258 highlights сен via snippet', v258&&v258.marks>=1&&v258.pre);
+  // match living only in the hidden "Изоҳ:" note must still be highlighted
+  // (2:228 has "ҳаққи" only in its note); snippet falls back to the full text.
+  await fill('ҳаққ');
+  const v228=await pg.evaluate(()=>{
+    const it=[...document.querySelectorAll('#verseHits .result-item')].find(x=>/Бақара · 228/.test(x.querySelector('.result-label').textContent));
+    if(!it)return null;const t=it.querySelector('.result-text');
+    return {marks:t.querySelectorAll('mark').length};
+  });
+  ok('note-only match 2:228 highlights ҳаққ', v228&&v228.marks>=1);
 
   console.log('=== 3. VERSE REFERENCE (single) ===');
   await fill('Бақара сураси, 25-оят');
