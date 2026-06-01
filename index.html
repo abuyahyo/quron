@@ -412,6 +412,13 @@ function _cap(r,up){return up?(r.charAt(0).toUpperCase()+r.slice(1)):r;}
 function cyr2lat(str){if(!str||!_CYR.test(str))return str;var out='';for(var i=0;i<str.length;i++){var ch=str[i],lo=ch.toLowerCase(),up=ch!==lo;if(lo==='\u0435'){var prev=i>0?str[i-1]:'';var atStart=(i===0)||!/[\u0400-\u04FF]/.test(prev);var afterV=_VOW.indexOf(prev)>=0;var r=(atStart||afterV||prev==='\u044A'||prev==='\u044C')?'ye':'e';out+=_cap(r,up);continue;}var m=_C2L[lo];if(m!==undefined)out+=_cap(m,up);else out+=ch;}return out;}
 // Search key: lowercase + transliterate + drop apostrophes so 'oz'/'o\u2019z' both match.
 function latKey(s){return cyr2lat((s||'').toLowerCase()).replace(/['\u2018\u2019\u02bb]/g,'');}
+// Latin-key piece for one Cyrillic char (apostrophes dropped, same \u0435->ye/e
+// rule as cyr2lat) + a position-aware map of a string's latin key back to source
+// Cyrillic indices, so a Latin-typed query can be highlighted in the Cyrillic
+// text it matched via _tll.
+function _c2lPiece(ch,prev){var lo=ch.toLowerCase();if(lo==='\u0435'){var atStart=!prev||!_CYR.test(prev);var afterV=_VOW.indexOf(prev)>=0;return(atStart||afterV||prev==='\u044a'||prev==='\u044c')?'ye':'e';}var m=_C2L[lo];return(m!==undefined?m:lo).replace(/['\u2018\u2019\u02bb]/g,'');}
+function latMap(t){var key='',map=[];for(var i=0;i<t.length;i++){var pc=_c2lPiece(t[i],i>0?t[i-1]:'');for(var k=0;k<pc.length;k++){key+=pc[k];map.push(i);}}return{key:key,map:map};}
+function _isLat(q){return !!q&&!_CYR.test(q)&&/[a-z]/i.test(q);}
 
 var curN=null,curHw='',fz=parseInt(sg('fs','16'),10)||16,th=sg('th','dark');
 var showAr=sg('ar','0')==='1';
@@ -492,10 +499,17 @@ function wbRe(q,flags){
   catch(_){return null;}
 }
 function wbIndex(t,q){var r=wbRe(q,'i');if(!r)return -1;var m=r.exec(t);return m?m.index+m[1].length:-1;}
+// Cyrillic index of a query's first word-start match — handles a Latin-typed
+// query by locating it in the text's latin key and mapping back.
+function uzIndex(t,q){
+  if(!q)return -1;
+  if(_isLat(q)){var qk=q.toLowerCase().replace(/['‘’ʻ]/g,'');var lm=latMap(t),r=wbRe(qk,'i');if(!r)return -1;var m=r.exec(lm.key);if(!m)return -1;var ks=m.index+m[1].length;return ks<lm.map.length?lm.map[ks]:-1;}
+  return wbIndex(t,q);
+}
 function snip(t,q,max){
   max=max||260;
   if(t.length<=max)return {s:t,pre:false,post:false};
-  var mi=q?wbIndex(t,q):-1;
+  var mi=q?uzIndex(t,q):-1;
   if(mi<0||mi+q.length<=max)return {s:t.substring(0,max),pre:false,post:true};
   var start=mi-70;if(start<0)start=0;
   var sp=t.indexOf(' ',start);if(sp>=0&&sp<mi&&sp-start<25)start=sp+1;
@@ -503,8 +517,20 @@ function snip(t,q,max){
   if(end>t.length){end=t.length;start=Math.max(0,end-max);}
   return {s:t.substring(start,end),pre:start>0,post:end<t.length};
 }
+// Highlight a Latin-typed query inside Cyrillic text via the latin-key map.
+function hlLatIn(t,q){
+  var qk=q.toLowerCase().replace(/['‘’ʻ]/g,'');if(!qk)return null;
+  var lm=latMap(t),re=wbRe(qk,'g');if(!re)return null;
+  var ranges=[],m;
+  while((m=re.exec(lm.key))){var ks=m.index+m[1].length,ke=ks+m[2].length-1;if(ke<lm.map.length)ranges.push([lm.map[ks],lm.map[ke]]);if(re.lastIndex<=m.index)re.lastIndex=m.index+1;}
+  if(!ranges.length)return null;
+  var out='',cur=0;
+  for(var r=0;r<ranges.length;r++){var a=ranges[r][0],b=ranges[r][1];if(a<cur)continue;out+=esc(t.substring(cur,a))+'<mark>'+esc(t.substring(a,b+1))+'</mark>';cur=b+1;}
+  return out+esc(t.substring(cur));
+}
 function hl(t,q){
   if(!q)return esc(t);
+  if(_isLat(q)){var lr=hlLatIn(t,q);if(lr!==null)return lr;return esc(t);}
   var s=esc(t);
   try{var re=wbRe(q,'gi');if(!re)return s;return s.replace(re,function(_,a,b){return a+'<mark>'+b+'</mark>';});}
   catch(e2){return s;}
@@ -528,11 +554,9 @@ function arSkel(q){var o='';for(var i=0;i<q.length;i++)o+=arFoldCh(q.charCodeAt(
 // loose consonant skeleton — same folding the search uses — then maps the
 // matched skeleton run back to the raw span (including any in-between harakat)
 // and wraps it in <mark>. Best-effort & vowel-insensitive; never breaks layout.
-function hlAr(t,q){
+function hlAr(t,q,max){
   if(!t)return '';
-  if(!q)return esc(t);
-  var qsk=arSkel(q);
-  if(!qsk)return esc(t);
+  var qsk=q?arSkel(q):'';
   var sk='',ps=[],pe=[];
   for(var i=0;i<t.length;){
     var f=arFoldCh(t.charCodeAt(i));
@@ -541,18 +565,26 @@ function hlAr(t,q){
     while(i<t.length&&arMark(t.charCodeAt(i)))i++;
     sk+=f;ps.push(st);pe.push(i-1);
   }
-  if(!sk)return esc(t);
-  var marks=[],from=0,idx;
-  while((idx=sk.indexOf(qsk,from))>=0){marks.push([ps[idx],pe[idx+qsk.length-1]]);from=idx+qsk.length;}
-  if(!marks.length)return esc(t);
-  var out='',cur=0;
+  var marks=[];
+  if(qsk&&sk){var from=0,idx;while((idx=sk.indexOf(qsk,from))>=0){marks.push([ps[idx],pe[idx+qsk.length-1]]);from=idx+qsk.length;}}
+  // Window long Arabic around the first match so a hit past the card cut stays
+  // visible (no max => whole verse, e.g. the sūra page).
+  var ws=0,we=t.length,pre=false,post=false;
+  if(max&&t.length>max){
+    var anchor=marks.length?marks[0][0]:0;
+    ws=anchor>max-40?anchor-40:0;
+    if(ws>0){var sp=t.indexOf(' ',ws);if(sp>=0&&sp<anchor&&sp-ws<25)ws=sp+1;}
+    we=ws+max;if(we>=t.length){we=t.length;ws=Math.max(0,we-max);}
+    pre=ws>0;post=we<t.length;
+  }
+  var out=pre?'… ':'',cur=ws;
   for(var m=0;m<marks.length;m++){
     var a=marks[m][0],b=marks[m][1];
-    if(a<cur)continue;
+    if(a<cur||a<ws||b>=we)continue;
     out+=esc(t.substring(cur,a))+'<mark>'+esc(t.substring(a,b+1))+'</mark>';
     cur=b+1;
   }
-  return out+esc(t.substring(cur));
+  return out+esc(t.substring(cur,we))+(post?' …':'');
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
 function cpWantAr(){return copyMode==='both'||copyMode==='ar';}
@@ -897,11 +929,11 @@ function renderVerseHits(q){
     // match living only in the note would show no highlight. Snippet from the
     // full text in that case so the matched word is still visible.
     var src=dt;
-    if(!r.ma&&q){var qx=q.toLowerCase();if(dt.toLowerCase().indexOf(qx)<0&&full.toLowerCase().indexOf(qx)>=0)src=full;}
+    if(!r.ma&&q&&uzIndex(dt,q)<0&&uzIndex(full,q)>=0)src=full;
     h+='<div class="result-item" data-n="'+r.s.number+'" data-lbl="'+esc(r.v.label)+'" onclick="App.hitTap(event,'+r.s.number+',\''+esc(r.v.label)+'\',\''+esc(q)+'\')">';
     h+='<div class="result-head"><div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-оят</div>';
     h+='<button type="button" class="result-copy" onclick="App.cpHit(event,'+r.s.number+',\''+esc(r.v.label)+'\')" aria-label="Оятни нусхалаш" title="Нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>';
-    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar.substring(0,260),q)+'</div>';
+    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar,q,260)+'</div>';
     var sn=snip(src,q,260);
     h+='<div class="result-text">'+(sn.pre?'… ':'')+hl(sn.s,q)+(sn.post?' …':'')+'</div></div>';
   }

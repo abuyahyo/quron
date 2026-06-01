@@ -64,6 +64,12 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   ok('ҳаққ excludes mid-word муҳаққақки (2:269)', !wb.has269);
   ok('ҳаққ keeps word-start ҳаққингизни (2:188)', wb.has188);
   ok('no highlight inside a longer word', !wb.midMark);
+  // Latin-typed query highlights the Cyrillic text it matched (via _tll map).
+  await fill('alloh');
+  const lat=await pg.$$eval('#verseHits .result-item',its=>its.slice(0,10).map(it=>it.querySelectorAll('.result-text mark').length));
+  ok('Latin query alloh highlights Cyrillic results', lat.length>0&&lat.every(n=>n>=1));
+  const latTxt=await pg.$eval('#verseHits .result-text mark',m=>m.textContent);
+  ok('Latin highlight wraps Cyrillic Аллоҳ', /Аллоҳ/i.test(latTxt));
 
   console.log('=== 3. VERSE REFERENCE (single) ===');
   await fill('Бақара сураси, 25-оят');
@@ -87,6 +93,11 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   const arMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.length);
   ok('arabic results found', arHits>=1);
   ok('every arabic result highlights the match', arMarks>=arHits);
+  // long-Arabic windowing: every visible الله result must show its match even
+  // when it sits past the card cut (hlAr windows around the hit).
+  await fill('الله');
+  const arCov=await pg.$$eval('#verseHits .result-text-ar',els=>els.filter(e=>e.querySelectorAll('mark').length===0).length);
+  ok('every الله result highlights (windowed)', arCov===0);
   // opening an arabic hit highlights the word on the detail page too
   await pg.click('#verseHits .result-item'); await pg.waitForTimeout(500);
   ok('detail verse-ar highlighted', (await pg.$$eval('#suraPage .verse-ar mark',e=>e.length))>=1);
