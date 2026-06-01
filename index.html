@@ -483,10 +483,19 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 // Window a long verse around the (Uzbek/Cyrillic) match so the highlighted
 // word stays visible — verses can be ~1000 chars but cards show ~260, and the
 // match may sit past that cut. Returns the slice + whether each end is clipped.
+// Uzbek/Latin search matches only at a word start (after a non-letter), so
+// "ҳаққ" hits "ҳаққи"/"ҳаққингизни" but not the middle of "муҳаққақки".
+// Boundary class covers Cyrillic (_tl) and the Latin search key (_tll).
+function wbRe(q,flags){
+  if(!q)return null;
+  try{return new RegExp('(^|[^\\u0400-\\u04FFa-z])('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')',flags);}
+  catch(_){return null;}
+}
+function wbIndex(t,q){var r=wbRe(q,'i');if(!r)return -1;var m=r.exec(t);return m?m.index+m[1].length:-1;}
 function snip(t,q,max){
   max=max||260;
   if(t.length<=max)return {s:t,pre:false,post:false};
-  var mi=q?t.toLowerCase().indexOf(q.toLowerCase()):-1;
+  var mi=q?wbIndex(t,q):-1;
   if(mi<0||mi+q.length<=max)return {s:t.substring(0,max),pre:false,post:true};
   var start=mi-70;if(start<0)start=0;
   var sp=t.indexOf(' ',start);if(sp>=0&&sp<mi&&sp-start<25)start=sp+1;
@@ -497,7 +506,7 @@ function snip(t,q,max){
 function hl(t,q){
   if(!q)return esc(t);
   var s=esc(t);
-  try{var re=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp(re,'gi'),function(m){return '<mark>'+m+'</mark>';});}
+  try{var re=wbRe(q,'gi');if(!re)return s;return s.replace(re,function(_,a,b){return a+'<mark>'+b+'</mark>';});}
   catch(e2){return s;}
 }
 // Arabic combining mark (harakat / tatweel / superscript alif etc.) — consumed
@@ -858,11 +867,12 @@ function renderVerseHits(q){
   }else{
     var re=(!arStrip&&hasVowel(q))?arRe(q):null;
     if(re){var any=false;for(var i=0;i<QD.length&&!any;i++){var sv=QD[i].verses;for(var j=0;j<sv.length;j++){if(sv[j]._als&&re.test(sv[j]._als)){any=true;break;}}}if(!any)re=null;}
+    var wreT=wbRe(ql,'i'),wreL=qll?wbRe(qll,'i'):null;
     for(var i=0;i<QD.length;i++){
       var s=QD[i];
       for(var j=0;j<s.verses.length;j++){
         var vv=s.verses[j];
-        var mt=vv._tl.indexOf(ql)>=0||(vv._tll&&qll&&vv._tll.indexOf(qll)>=0);
+        var mt=(wreT&&wreT.test(vv._tl))||(wreL&&vv._tll&&wreL.test(vv._tll));
         var ma=arStrip?(reNoAl?(!!vv._als&&reNoAl.test(vv._als)):(qan&&vv.ar&&normArNoAl(vv.ar).indexOf(qan)>=0)):(re?(!!vv._als&&re.test(vv._als)):(qa&&vv._al&&vv._al.indexOf(qa)>=0));
         if(mt||ma)vr.push({s:s,v:vv,ma:ma});
       }

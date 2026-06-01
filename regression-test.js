@@ -54,6 +54,16 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
     return {marks:t.querySelectorAll('mark').length};
   });
   ok('note-only match 2:228 highlights ҳаққ', v228&&v228.marks>=1);
+  // word-boundary: search hits word starts only, so "ҳаққ" matches
+  // "ҳаққи"/"ҳаққингизни" but NOT the middle of "муҳаққақки" (2:269).
+  const wb=await pg.evaluate(()=>{
+    const labels=[...document.querySelectorAll('#verseHits .result-label')].map(e=>e.textContent);
+    return {has269:labels.some(l=>/Бақара · 269/.test(l)),has188:labels.some(l=>/Бақара · 188/.test(l)),
+      midMark:[...document.querySelectorAll('#verseHits mark')].some(m=>/му/i.test(m.textContent))};
+  });
+  ok('ҳаққ excludes mid-word муҳаққақки (2:269)', !wb.has269);
+  ok('ҳаққ keeps word-start ҳаққингизни (2:188)', wb.has188);
+  ok('no highlight inside a longer word', !wb.midMark);
 
   console.log('=== 3. VERSE REFERENCE (single) ===');
   await fill('Бақара сураси, 25-оят');
