@@ -27,6 +27,24 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 
   console.log('=== 2. UZBEK SEARCH ===');
   await fill('раҳмон'); ok('раҳмон finds verses', (await hits())>40);
+  // snippet: match past the ~260-char card cut must still be highlighted (2:258
+  // is ~989 chars with "сен" near the end). Card windows around the match.
+  await fill('сен');
+  const senMarks=await pg.$$eval('#verseHits .result-item',items=>items.slice(0,8).map(it=>it.querySelectorAll('.result-text mark').length));
+  ok('every visible сен result highlights the word', senMarks.every(n=>n>=1));
+  // page in more hits until the long verse 2:258 is rendered
+  for(let k=0;k<5;k++){
+    const has=await pg.evaluate(()=>[...document.querySelectorAll('#verseHits .result-label')].some(e=>/Бақара · 258/.test(e.textContent)));
+    if(has)break;
+    const more=await pg.$('#verseHits .hits-more');if(!more)break;
+    await more.click();await pg.waitForTimeout(250);
+  }
+  const v258=await pg.evaluate(()=>{
+    const it=[...document.querySelectorAll('#verseHits .result-item')].find(x=>/Бақара · 258/.test(x.querySelector('.result-label').textContent));
+    if(!it)return null;const t=it.querySelector('.result-text');
+    return {marks:t.querySelectorAll('mark').length,pre:t.textContent.trim().startsWith('…')};
+  });
+  ok('long verse 2:258 highlights сен via snippet', v258&&v258.marks>=1&&v258.pre);
 
   console.log('=== 3. VERSE REFERENCE (single) ===');
   await fill('Бақара сураси, 25-оят');
