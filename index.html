@@ -478,6 +478,20 @@ var ICN={
 };
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// Window a long verse around the (Uzbek/Cyrillic) match so the highlighted
+// word stays visible — verses can be ~1000 chars but cards show ~260, and the
+// match may sit past that cut. Returns the slice + whether each end is clipped.
+function snip(t,q,max){
+  max=max||260;
+  if(t.length<=max)return {s:t,pre:false,post:false};
+  var mi=q?t.toLowerCase().indexOf(q.toLowerCase()):-1;
+  if(mi<0||mi+q.length<=max)return {s:t.substring(0,max),pre:false,post:true};
+  var start=mi-70;if(start<0)start=0;
+  var sp=t.indexOf(' ',start);if(sp>=0&&sp<mi&&sp-start<25)start=sp+1;
+  var end=start+max;
+  if(end>t.length){end=t.length;start=Math.max(0,end-max);}
+  return {s:t.substring(start,end),pre:start>0,post:end<t.length};
+}
 function hl(t,q){
   if(!q)return esc(t);
   var s=esc(t);
@@ -871,7 +885,8 @@ function renderVerseHits(q){
     h+='<div class="result-head"><div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-оят</div>';
     h+='<button type="button" class="result-copy" onclick="App.cpHit(event,'+r.s.number+',\''+esc(r.v.label)+'\')" aria-label="Оятни нусхалаш" title="Нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>';
     if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar.substring(0,260),q)+'</div>';
-    h+='<div class="result-text">'+hl(dt.substring(0,260),q)+'</div></div>';
+    var sn=snip(dt,q,260);
+    h+='<div class="result-text">'+(sn.pre?'… ':'')+hl(sn.s,q)+(sn.post?' …':'')+'</div></div>';
   }
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
   if(sugAl)h+='<button type="button" class="ar-sug" onclick="App.arStrip()">\u0410\u0440\u0442\u0438\u043a\u043b\u0441\u0438\u0437 \u04b3\u0430\u043c \u049b\u0438\u0434\u0438\u0440\u0438\u0448</button>';
