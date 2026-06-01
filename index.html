@@ -242,6 +242,7 @@ body.select-mode .result-copy{display:none}
 .result-text{font-size:14px;line-height:1.7;color:var(--text-dim)}
 .result-text mark{background:var(--gold-soft);color:var(--text);border-radius:3px;padding:1px 4px;font-weight:500}
 .result-text-ar{font-family:'Scheherazade New','Amiri','Geeza Pro','Noto Naskh Arabic',serif;text-align:right;font-size:18px;line-height:1.85;color:var(--text);margin-bottom:6px;direction:rtl;font-weight:400}
+.result-text-ar mark,.verse-ar mark{background:var(--gold-soft);color:inherit;border-radius:4px;padding:0 3px}
 
 .float-bar{position:fixed;bottom:18px;left:50%;transform:translate(-50%,0);background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:28px;display:none;align-items:center;z-index:55;box-shadow:var(--glass-shadow),var(--glass-edge);overflow:hidden;opacity:1;transition:transform .25s ease,opacity .25s ease}
 .float-bar.visible{display:flex}
@@ -482,6 +483,51 @@ function hl(t,q){
   var s=esc(t);
   try{var re=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp(re,'gi'),function(m){return '<mark>'+m+'</mark>';});}
   catch(e2){return s;}
+}
+// Arabic combining mark (harakat / tatweel / superscript alif etc.) — consumed
+// with the preceding base letter so a highlight wraps a consonant + its vowels.
+function arMark(c){return (c>=0x610&&c<=0x61A)||(c>=0x64B&&c<=0x65F)||c===0x670||(c>=0x6D6&&c<=0x6ED)||c===0x640||(c>=0x8D3&&c<=0x8FF)||(c>=0x200B&&c<=0x200F)||c===0xFEFF;}
+// Fold one char to its loose skeleton (mirrors normAr): marks/hamza/alif drop to
+// '', waw/ya-hamza and ta-marbuta fold, other base letters pass through.
+function arFoldCh(c){
+  if(arMark(c))return '';
+  if(c===0x621||c===0x622||c===0x623||c===0x625||c===0x627||c===0x649||c===0x671)return '';
+  if(c===0x624)return 'و';
+  if(c===0x626)return 'ي';
+  if(c===0x629)return 'ه';
+  if(c>=0x627&&c<=0x64A)return String.fromCharCode(c);
+  return '';
+}
+function arSkel(q){var o='';for(var i=0;i<q.length;i++)o+=arFoldCh(q.charCodeAt(i));return o;}
+// Highlight the Arabic query inside raw (voweled) Arabic text. Matches on the
+// loose consonant skeleton — same folding the search uses — then maps the
+// matched skeleton run back to the raw span (including any in-between harakat)
+// and wraps it in <mark>. Best-effort & vowel-insensitive; never breaks layout.
+function hlAr(t,q){
+  if(!t)return '';
+  if(!q)return esc(t);
+  var qsk=arSkel(q);
+  if(!qsk)return esc(t);
+  var sk='',ps=[],pe=[];
+  for(var i=0;i<t.length;){
+    var f=arFoldCh(t.charCodeAt(i));
+    if(!f){i++;continue;}
+    var st=i;i++;
+    while(i<t.length&&arMark(t.charCodeAt(i)))i++;
+    sk+=f;ps.push(st);pe.push(i-1);
+  }
+  if(!sk)return esc(t);
+  var marks=[],from=0,idx;
+  while((idx=sk.indexOf(qsk,from))>=0){marks.push([ps[idx],pe[idx+qsk.length-1]]);from=idx+qsk.length;}
+  if(!marks.length)return esc(t);
+  var out='',cur=0;
+  for(var m=0;m<marks.length;m++){
+    var a=marks[m][0],b=marks[m][1];
+    if(a<cur)continue;
+    out+=esc(t.substring(cur,a))+'<mark>'+esc(t.substring(a,b+1))+'</mark>';
+    cur=b+1;
+  }
+  return out+esc(t.substring(cur));
 }
 function gS(n){for(var i=0;i<QD.length;i++)if(QD[i].number===n)return QD[i];return null;}
 function cpWantAr(){return copyMode==='both'||copyMode==='ar';}
@@ -745,7 +791,7 @@ function openSura(num,hw,scrollVerse){
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
     vH+='<button class="verse-num" type="button" data-num="'+num+'" data-lbl="'+lbl+'" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш ёки узун босиш билан танлаш" title="Нусха олиш — узун босиш билан кўплаб танлаш"><span>'+lbl+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>';
-    if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+esc(v.ar)+'</div>';
+    if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+hlAr(v.ar,hw)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
     if(p.iz){
       vH+='<span class="izoh-toggle" onclick="App.iz(this)">▼ Изоҳни кўриш</span>';
@@ -824,7 +870,7 @@ function renderVerseHits(q){
     h+='<div class="result-item" data-n="'+r.s.number+'" data-lbl="'+esc(r.v.label)+'" onclick="App.hitTap(event,'+r.s.number+',\''+esc(r.v.label)+'\',\''+esc(q)+'\')">';
     h+='<div class="result-head"><div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-оят</div>';
     h+='<button type="button" class="result-copy" onclick="App.cpHit(event,'+r.s.number+',\''+esc(r.v.label)+'\')" aria-label="Оятни нусхалаш" title="Нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>';
-    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+esc(r.v.ar.substring(0,260))+'</div>';
+    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar.substring(0,260),q)+'</div>';
     h+='<div class="result-text">'+hl(dt.substring(0,260),q)+'</div></div>';
   }
   if(vr.length>lim)h+='<button type="button" class="hits-more" onclick="App.moreHits()">Яна '+(vr.length-lim)+' та натижани кўрсатиш</button>';
