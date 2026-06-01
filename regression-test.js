@@ -44,6 +44,17 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('الجِنّة');
   ok('الجِنّة includes An-Nas', (await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent))).some(t=>/114\./.test(t)));
 
+  console.log('=== 5b. ARABIC HIGHLIGHT ===');
+  await fill('سماعون للكذب');
+  const arHits=await pg.$$eval('#verseHits .result-text-ar',e=>e.length);
+  const arMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.length);
+  ok('arabic results found', arHits>=1);
+  ok('every arabic result highlights the match', arMarks>=arHits);
+  // opening an arabic hit highlights the word on the detail page too
+  await pg.click('#verseHits .result-item'); await pg.waitForTimeout(500);
+  ok('detail verse-ar highlighted', (await pg.$$eval('#suraPage .verse-ar mark',e=>e.length))>=1);
+  await pg.evaluate(()=>App.goHome());await pg.waitForTimeout(200);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
