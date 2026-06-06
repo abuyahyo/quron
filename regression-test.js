@@ -130,12 +130,10 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
 
-  console.log('=== 7. JANNAH SMART SEARCH ===');
+  console.log('=== 7. NO JANNAH SUGGESTION (feature removed) ===');
   await fill('жаннат');
-  ok('jannah button shows', (await pg.$$eval('#verseHits .jannah-sug',e=>e.length))===1);
-  await pg.click('#verseHits .jannah-sug'); await pg.waitForTimeout(450);
-  const jlbl=await pg.$eval('#verseHits .section-label',e=>e.textContent);
-  ok('jannah label 297', jlbl.includes('297'));
+  ok('no jannah suggestion button', (await pg.$$eval('#verseHits .jannah-sug',e=>e.length))===0);
+  ok('жаннат still finds verses normally', (await hits())>0);
 
   console.log('=== 8. COPY MODES ===');
   await fill('Бақара сураси, 25-оят');
