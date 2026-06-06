@@ -103,6 +103,17 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   ok('detail verse-ar highlighted', (await pg.$$eval('#suraPage .verse-ar mark',e=>e.length))>=1);
   await pg.evaluate(()=>App.goHome());await pg.waitForTimeout(200);
 
+  console.log('=== 5c. ARABIC WORD-BOUNDARY (no cross-word matches) ===');
+  // Loose Arabic normalization keeps spaces, so a query can't bridge two words.
+  // ملتنا (مِلَّتِنَا "our religion") must match Аъроф 88-89 / Иброҳим 13-14 but
+  // NOT the مَّ‿لَا‿تُن span of ثُمَّ لَا تُنظِرُونِ in Ҳуд 54-55.
+  await fill('ملتنا');
+  const mlLabels=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('ملتنا keeps real word match (Аъроф 88-89)', mlLabels.some(t=>/Аъроф · 88-89/.test(t)));
+  ok('ملتنا excludes cross-word span (Ҳуд 54-55)', !mlLabels.some(t=>/Ҳуд · 54-55/.test(t)));
+  const mlNoMark=await pg.$$eval('#verseHits .result-text-ar',els=>els.filter(e=>e.querySelectorAll('mark').length===0).length);
+  ok('every ملتنا arabic result highlights the match', mlNoMark===0);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
