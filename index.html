@@ -425,14 +425,15 @@ var _homeScroll=0;
 var selMode=false,selSet={},longPressed=false,pressTimer=null;
 var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[],arStrip=false;
 
-function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/[^\u0627-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
-function normArNoAl(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/g,'$1$2').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/[^\u0627-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
+function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u0653\u0656-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/\u0648[\u0654\u0655]/g,'\u0648').replace(/[\u0649\u064A][\u0654\u0655]/g,'\u064A').replace(/[\u0654\u0655]/g,'\u0621').replace(/[\u0622\u0623\u0625]/g,'\u0621').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0649/g,'\u064A').replace(/[\u0627\u0671]/g,'').replace(/[^\u0621-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
+function normArNoAl(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u0653\u0656-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/g,'$1$2').replace(/\u0648[\u0654\u0655]/g,'\u0648').replace(/[\u0649\u064A][\u0654\u0655]/g,'\u064A').replace(/[\u0654\u0655]/g,'\u0621').replace(/[\u0622\u0623\u0625]/g,'\u0621').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/\u0649/g,'\u064A').replace(/[\u0627\u0671]/g,'').replace(/[^\u0621-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
 function hasAl(q){return /(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/.test((q||'').replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED\u0670]/g,''));}
 // Word-start matcher for a loose Arabic key (output of normAr/normArNoAl, which
-// keeps single spaces and drops alif). The key must begin a word, optionally
-// after the attached proclitics \u0648 \u0641 \u0628 \u0643 \u0644 (which also cover the article \u0627\u0644 \u2014 its
-// alif is already dropped, leaving the \u0644). Mirrors the word-start behaviour of
-// the Uzbek search so \u062D\u064A\u0629 matches the word \u062D\u064E\u064A\u064E\u0651\u0629 but not the tail of \u062A\u064E\u062D\u0650\u064A\u064E\u0651\u0629.
+// keeps single spaces and drops plain alif). The key must begin a word, optionally
+// after the proclitics \u0648 \u0641 \u0628 \u0643 \u0644 (which also cover the article \u0627\u0644 \u2014 its alif is
+// dropped, leaving the \u0644). Mirrors the Uzbek word-start search: \u062D\u064A\u0629 matches the
+// word \u062D\u064E\u064A\u064E\u0651\u0629 but not the tail of \u062A\u064E\u062D\u0650\u064A\u064E\u0651\u0629. Hamza (\u0623 \u0625 \u0622 \u0621) is kept, so \u0623\u0639\u0644\u0649
+// ('highest', key \u0621\u0639\u0644) no longer collapses to \u0639\u0644 and over-match \u0639\u0644\u0649.
 function arWbRe(key){if(!key)return null;try{return new RegExp('(?:^| )[\u0648\u0641\u0628\u0643\u0644]*'+key);}catch(e){return null;}}
 
 function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
@@ -530,8 +531,10 @@ function hl(t,q){
 // Arabic combining mark (harakat / tatweel / superscript alif etc.) — consumed
 // with the preceding base letter so a highlight wraps a consonant + its vowels.
 function arMark(c){return (c>=0x610&&c<=0x61A)||(c>=0x64B&&c<=0x65F)||c===0x670||(c>=0x6D6&&c<=0x6ED)||c===0x640||(c>=0x8D3&&c<=0x8FF)||(c>=0x200B&&c<=0x200F)||c===0xFEFF;}
-// Fold one char to its loose skeleton (mirrors normAr): marks/hamza/alif drop to
-// '', waw/ya-hamza fold; ta-marbuta and other base letters pass through.
+// Fold one char to the highlight skeleton: marks, hamza and alif (incl. maqsura
+// / wasla) drop to ''; waw/ya-hamza fold; ta-marbuta and other base letters pass
+// through. This is the consonant core — coarser than the search key (which keeps
+// hamza), so a hit is still located; arDrop* below reclaims edge alif/maqsura.
 function arFoldCh(c){
   if(arMark(c))return '';
   if(c===0x621||c===0x622||c===0x623||c===0x625||c===0x627||c===0x649||c===0x671)return '';
@@ -541,11 +544,11 @@ function arFoldCh(c){
   return '';
 }
 function arSkel(q){var o='';for(var i=0;i<q.length;i++)o+=arFoldCh(q.charCodeAt(i));return o;}
-// Alif/hamza/alif-maqsura: base letters the loose skeleton folds away, so they
-// never land in a match span on their own.
+// Hamza/alif/maqsura: base letters the skeleton folds away, so they never land in
+// a match span on their own.
 function arDropBase(c){return c===0x621||c===0x622||c===0x623||c===0x625||c===0x627||c===0x649||c===0x671;}
-// Does the query end / start with such a dropped letter (ignoring harakat)? If
-// so the match span should reclaim the matching alif in the verse so the whole
+// Does the query end / start with such a dropped alif (ignoring harakat)? If so
+// the match span should reclaim the matching alif in the verse so the whole
 // written word is highlighted (e.g. the trailing ا of ملتنا / مِلَّتِنَا).
 function arDropEnd(q){for(var i=(q||'').length-1;i>=0;i--){var c=q.charCodeAt(i);if(arMark(c))continue;return arDropBase(c);}return false;}
 function arDropStart(q){for(var i=0;i<(q||'').length;i++){var c=q.charCodeAt(i);if(arMark(c))continue;return arDropBase(c);}return false;}
@@ -567,9 +570,9 @@ function hlAr(t,q,max){
   var marks=[],dE=arDropEnd(q),dS=arDropStart(q);
   if(qsk&&sk){var from=0,idx;while((idx=sk.indexOf(qsk,from))>=0){
     var a=ps[idx],b=pe[idx+qsk.length-1];
-    // Reclaim a trailing/leading alif the skeleton dropped from BOTH the query
-    // and the verse, so the full written word is marked. Gated by the query so
-    // a bare consonant query can't swallow a stray alif; stops at real letters
+    // Reclaim a trailing/leading plain alif the skeleton dropped from BOTH the
+    // query and the verse, so the full written word is marked. Gated by the query
+    // so a bare consonant query can't swallow a stray alif; stops at real letters
     // and spaces so it never bleeds into an adjacent word.
     if(dE)while(b+1<t.length){var cc=t.charCodeAt(b+1);if(arMark(cc)||arDropBase(cc))b++;else break;}
     if(dS)while(a>0&&arDropBase(t.charCodeAt(a-1))){a--;while(a>0&&arMark(t.charCodeAt(a-1)))a--;}

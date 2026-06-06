@@ -151,6 +151,22 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   // like الله is not broken by the word-start anchor.
   await fill('الله'); ok('الله still finds many verses (proclitics intact)', (await hits())>50);
 
+  console.log('=== 5f. HAMZA KEPT / ALIF DROPPED (no over-collapse) ===');
+  // Hamza (أ إ آ ء, incl. the combining U+0654/U+0655 the Quran uses) is kept, so
+  // أعلى ("Most High") no longer collapses to عل and matches على/عالمين/عليهم.
+  await fill('أعلى');
+  const aLabels=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('أعلى finds few, precise hits (<30, not ~2000)', aLabels.length>0 && aLabels.length<30);
+  ok('أعلى excludes عالمين (Фотиҳа 2)', !aLabels.some(t=>/Фотиҳа · 2-оят/.test(t)));
+  ok('أعلى excludes على-only (Бақара 5)', !aLabels.some(t=>/Бақара · 5-оят/.test(t)));
+  // Plain alif is still dropped so dagger-alif spellings match: كِتَٰب for كتاب,
+  // هَٰذَا for هذا — both common and written with a superscript alif. (hits() caps
+  // at the 100-row display limit, so read the real total from the section label.)
+  const total=async()=>{const t=await pg.$eval('#verseHits .section-label',e=>e.textContent).catch(()=>'');const m=t.match(/(\d+)/);return m?+m[1]:0;};
+  await fill('كتاب'); ok('كتاب matches dagger-alif كِتَٰب (>100)', (await total())>100);
+  await fill('هذا'); ok('هذا matches dagger-alif هَٰذَا (>100)', (await total())>100);
+  await fill('مؤمن'); ok('مؤمن (waw-hamza) still matches (>100)', (await total())>100);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
