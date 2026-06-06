@@ -49,7 +49,7 @@ There's no test suite, so do a real browser smoke test before declaring work don
 The single search box drives several layers, all in `index.html`. When changing any of them, re-run the regression test (a Playwright script that asserts ~22 checks across every feature below; write it to `/tmp/*.js` and `node` it against the local server).
 
 **Arabic normalization (three levels):**
-- `normAr(s)` — loose: strips harakat, folds hamza/alif/ta-marbuta, and **drops a word-initial definite article** `ال` when the stem is ≥3 letters (so `المقام` matches `مقام`). Article-insensitive.
+- `normAr(s)` — loose: strips harakat, folds hamza/alif, and **drops a word-initial definite article** `ال` when the stem is ≥3 letters (so `المقام` matches `مقام`). Article-insensitive. **Ta-marbuta `ة` is kept distinct from haa `ه`** (Quran spelling is canonical, so folding them only made a `ة` query collide with a pronoun `ه` — e.g. `حية` wrongly matching `نوحيه`). `arFoldCh` (the highlight skeleton) and `normArStrict` mirror this, so don't re-add a `ة→ه` map to one without the others.
 - `normArStrict(s)` — keeps harakat (maps presentation-form vowels to standard). Used by `arRe`.
 - `arRe(q)` — builds a regex from a (partly) voweled query: each consonant in order, and **only the short vowels the user actually typed** are required on their consonant (bare consonants match any vowel). This is what keeps `الجَنَّة` (fatha) distinct from `الجِنّة` (kasra). `hasVowel(q)` decides whether to use it.
 

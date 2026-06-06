@@ -126,6 +126,18 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   const mltMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent.replace(/[ً-ْٰۖ-ۭ]/g,'')));
   ok('ملت does not over-extend onto a trailing alif', mltMarks.length>0&&mltMarks.every(s=>!/ا$/.test(s)));
 
+  console.log('=== 5d. TA-MARBUTA IS NOT HAA ===');
+  // ة and ه are distinct letters (Quran spelling is canonical), so a ة query must
+  // not collide with a pronoun ه: حية (snake / تحية) must hit Тоҳа 20:20 حَيَّةٌ but
+  // NOT نُوحِيهِ (Ол-и-Имрон 44) or أَحْيَاهُم (Бақара 243).
+  await fill('حية');
+  const tmLabels=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('حية finds the snake verse Тоҳа 20', tmLabels.some(t=>/Тоҳа · 20-оят/.test(t)));
+  ok('حية excludes pronoun-haa نوحيه (Ол-и-Имрон 44)', !tmLabels.some(t=>/Имрон · 44-оят/.test(t)));
+  ok('حية excludes pronoun-haa أحياهم (Бақара 243)', !tmLabels.some(t=>/Бақара · 243-оят/.test(t)));
+  const tmMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent.replace(/[ً-ٟۖ-ۭ]/g,'')));
+  ok('every حية highlight actually contains ة', tmMarks.length>0&&tmMarks.every(s=>/ة/.test(s)));
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
