@@ -550,6 +550,14 @@ function arFoldCh(c){
   return '';
 }
 function arSkel(q){var o='';for(var i=0;i<q.length;i++)o+=arFoldCh(q.charCodeAt(i));return o;}
+// Alif/hamza/alif-maqsura: base letters the loose skeleton folds away, so they
+// never land in a match span on their own.
+function arDropBase(c){return c===0x621||c===0x622||c===0x623||c===0x625||c===0x627||c===0x649||c===0x671;}
+// Does the query end / start with such a dropped letter (ignoring harakat)? If
+// so the match span should reclaim the matching alif in the verse so the whole
+// written word is highlighted (e.g. the trailing ا of ملتنا / مِلَّتِنَا).
+function arDropEnd(q){for(var i=(q||'').length-1;i>=0;i--){var c=q.charCodeAt(i);if(arMark(c))continue;return arDropBase(c);}return false;}
+function arDropStart(q){for(var i=0;i<(q||'').length;i++){var c=q.charCodeAt(i);if(arMark(c))continue;return arDropBase(c);}return false;}
 // Highlight the Arabic query inside raw (voweled) Arabic text. Matches on the
 // loose consonant skeleton — same folding the search uses — then maps the
 // matched skeleton run back to the raw span (including any in-between harakat)
@@ -565,8 +573,16 @@ function hlAr(t,q,max){
     while(i<t.length&&arMark(t.charCodeAt(i)))i++;
     sk+=f;ps.push(st);pe.push(i-1);
   }
-  var marks=[];
-  if(qsk&&sk){var from=0,idx;while((idx=sk.indexOf(qsk,from))>=0){marks.push([ps[idx],pe[idx+qsk.length-1]]);from=idx+qsk.length;}}
+  var marks=[],dE=arDropEnd(q),dS=arDropStart(q);
+  if(qsk&&sk){var from=0,idx;while((idx=sk.indexOf(qsk,from))>=0){
+    var a=ps[idx],b=pe[idx+qsk.length-1];
+    // Reclaim a trailing/leading alif the skeleton dropped from BOTH the query
+    // and the verse, so the full written word is marked. Gated by the query so
+    // a bare consonant query can't swallow a stray alif; stops at real letters
+    // and spaces so it never bleeds into an adjacent word.
+    if(dE)while(b+1<t.length){var cc=t.charCodeAt(b+1);if(arMark(cc)||arDropBase(cc))b++;else break;}
+    if(dS)while(a>0&&arDropBase(t.charCodeAt(a-1))){a--;while(a>0&&arMark(t.charCodeAt(a-1)))a--;}
+    marks.push([a,b]);from=idx+qsk.length;}}
   // Window long Arabic around the first match so a hit past the card cut stays
   // visible (no max => whole verse, e.g. the sūra page).
   var ws=0,we=t.length,pre=false,post=false;
