@@ -138,6 +138,19 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   const tmMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent.replace(/[ً-ٟۖ-ۭ]/g,'')));
   ok('every حية highlight actually contains ة', tmMarks.length>0&&tmMarks.every(s=>/ة/.test(s)));
 
+  console.log('=== 5e. ARABIC WORD-START (proclitic-aware) ===');
+  // Arabic search anchors at word starts (allowing و/ف/ب/ك/ل + the article ال),
+  // like the Uzbek search — so حية matches the word حَيَّة but NOT the tail of
+  // تَحِيَّة (Нисо 86 / Нур 61 / Фурқон 75).
+  await fill('حية');
+  const wbLabels=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('حية matches the standalone word (Тоҳа 20)', wbLabels.some(t=>/Тоҳа · 20-оят/.test(t)));
+  ok('حية does NOT match the tail of تحية (Нур 61)', !wbLabels.some(t=>/Нур · 61-оят/.test(t)));
+  ok('حية does NOT match the tail of تحية (Нисо 86)', !wbLabels.some(t=>/Нисо · 86-оят/.test(t)));
+  // Proclitic-prefixed words must still be found (وَ/الْ etc.), so a common word
+  // like الله is not broken by the word-start anchor.
+  await fill('الله'); ok('الله still finds many verses (proclitics intact)', (await hits())>50);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
