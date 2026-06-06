@@ -113,6 +113,18 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   ok('ملتنا excludes cross-word span (Ҳуд 54-55)', !mlLabels.some(t=>/Ҳуд · 54-55/.test(t)));
   const mlNoMark=await pg.$$eval('#verseHits .result-text-ar',els=>els.filter(e=>e.querySelectorAll('mark').length===0).length);
   ok('every ملتنا arabic result highlights the match', mlNoMark===0);
+  // The query ends with alif, which the loose skeleton drops — the highlight must
+  // still cover the trailing ا of مِلَّتِنَا, not stop at مِلَّتِنَ.
+  const mlMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent));
+  ok('ملتنا highlight includes the trailing alif', mlMarks.length>0&&mlMarks.every(s=>/ا/.test(s)));
+  // Article alif at the start must be inside the highlight too (الجنة -> ٱلجنة).
+  await fill('الجنة');
+  const aljMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent).slice(0,6));
+  ok('الجنة highlight includes the leading article alif', aljMarks.length>0&&aljMarks.every(s=>/^[اٱ]/.test(s)));
+  // A bare-consonant query must NOT over-grab a trailing alif it never typed.
+  await fill('ملت');
+  const mltMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent.replace(/[ً-ْٰۖ-ۭ]/g,'')));
+  ok('ملت does not over-extend onto a trailing alif', mltMarks.length>0&&mltMarks.every(s=>!/ا$/.test(s)));
 
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
