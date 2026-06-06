@@ -428,6 +428,12 @@ var hitMode=false,hitSel={},hitLimit=100,lastHits=[],lastRefs=[],arStrip=false;
 function normAr(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/[^\u0627-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
 function normArNoAl(s){if(!s)return '';return s.replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED\u0640\u0670\u200B-\u200F\u08D3-\u08FF\uFEFF]/g,'').replace(/(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/g,'$1$2').replace(/[\u0621\u0622\u0623\u0625\u0627\u0649\u0671]/g,'').replace(/\u0624/g,'\u0648').replace(/\u0626/g,'\u064A').replace(/[^\u0627-\u064A ]/g,'').replace(/\s+/g,' ').trim();}
 function hasAl(q){return /(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0671]\u0644([\u0621-\u064A]{3,})/.test((q||'').replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED\u0670]/g,''));}
+// Word-start matcher for a loose Arabic key (output of normAr/normArNoAl, which
+// keeps single spaces and drops alif). The key must begin a word, optionally
+// after the attached proclitics \u0648 \u0641 \u0628 \u0643 \u0644 (which also cover the article \u0627\u0644 \u2014 its
+// alif is already dropped, leaving the \u0644). Mirrors the word-start behaviour of
+// the Uzbek search so \u062D\u064A\u0629 matches the word \u062D\u064E\u064A\u064E\u0651\u0629 but not the tail of \u062A\u064E\u062D\u0650\u064A\u064E\u0651\u0629.
+function arWbRe(key){if(!key)return null;try{return new RegExp('(?:^| )[\u0648\u0641\u0628\u0643\u0644]*'+key);}catch(e){return null;}}
 
 function hasHarakat(s){return /[\u064B-\u0652\u0670\u06D6-\u06ED\u08F0-\u08F2]/.test(s||'');}
 
@@ -893,6 +899,7 @@ function renderVerseHits(q){
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
   var ql=q.toLowerCase(),qll=ql.replace(/['\u2018\u2019\u02bb]/g,''),qa=normAr(q),qan=arStrip?normArNoAl(q):'',vr=[];
+  var qaWb=arWbRe(qa),qanWb=arStrip?arWbRe(qan):null;
   var reNoAl=(arStrip&&hasVowel(q))?arRe(q.replace(/(^|\s)[\u0627\u0622\u0623\u0625\u0671]\u0644/g,'$1')):null;
   if(reNoAl){var anyN=false;for(var i=0;i<QD.length&&!anyN;i++){var svN=QD[i].verses;for(var j=0;j<svN.length;j++){if(svN[j]._als&&reNoAl.test(svN[j]._als)){anyN=true;break;}}}if(!anyN)reNoAl=null;}
   var re=(!arStrip&&hasVowel(q))?arRe(q):null;
@@ -903,14 +910,14 @@ function renderVerseHits(q){
     for(var j=0;j<s.verses.length;j++){
       var vv=s.verses[j];
       var mt=(wreT&&wreT.test(vv._tl))||(wreL&&vv._tll&&wreL.test(vv._tll));
-      var ma=arStrip?(reNoAl?(!!vv._als&&reNoAl.test(vv._als)):(qan&&vv.ar&&normArNoAl(vv.ar).indexOf(qan)>=0)):(re?(!!vv._als&&re.test(vv._als)):(qa&&vv._al&&vv._al.indexOf(qa)>=0));
+      var ma=arStrip?(reNoAl?(!!vv._als&&reNoAl.test(vv._als)):(qanWb&&vv.ar&&qanWb.test(normArNoAl(vv.ar)))):(re?(!!vv._als&&re.test(vv._als)):(qaWb&&vv._al&&qaWb.test(vv._al)));
       if(mt||ma)vr.push({s:s,v:vv,ma:ma});
     }
   }
   var sugAl=false;
   if(!arStrip&&qa&&hasAl(q)){
     if(hasVowel(q)){var reA=arRe(q.replace(/(^|\s)[\u0627\u0622\u0623\u0625\u0671]\u0644/g,'$1'));if(reA){for(var i=0;i<QD.length&&!sugAl;i++){var svA=QD[i].verses;for(var j=0;j<svA.length;j++){if(svA[j]._als&&reA.test(svA[j]._als)){sugAl=true;break;}}}}}
-    else{var keyA=normArNoAl(q);if(keyA){for(var i=0;i<QD.length&&!sugAl;i++){var svA=QD[i].verses;for(var j=0;j<svA.length;j++){if(svA[j].ar&&normArNoAl(svA[j].ar).indexOf(keyA)>=0){sugAl=true;break;}}}}}
+    else{var keyA=normArNoAl(q),keyWb=arWbRe(keyA);if(keyWb){for(var i=0;i<QD.length&&!sugAl;i++){var svA=QD[i].verses;for(var j=0;j<svA.length;j++){if(svA[j].ar&&keyWb.test(normArNoAl(svA[j].ar))){sugAl=true;break;}}}}}
   }
   if(!vr.length){lastHits=[];box.innerHTML=(sugAl?('<button type="button" class="ar-sug" onclick="App.arStrip()">\u0410\u0440\u0442\u0438\u043a\u043b\u0441\u0438\u0437 \u049b\u0438\u0434\u0438\u0440\u0438\u0431 \u043a\u045e\u0440\u0438\u0448</button>'):'');return;}
   lastHits=vr;
