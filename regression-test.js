@@ -166,6 +166,16 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('كتاب'); ok('كتاب matches dagger-alif كِتَٰب (>100)', (await total())>100);
   await fill('هذا'); ok('هذا matches dagger-alif هَٰذَا (>100)', (await total())>100);
   await fill('مؤمن'); ok('مؤمن (waw-hamza) still matches (>100)', (await total())>100);
+  // A query word the user typed with a PLAIN alif (the common no-hamza typing) must
+  // still reach verse words written with a hamza (key ءبصر for أبصر). Otherwise the
+  // dropped query alif + the kept verse ء block the word-start match: ابصر به → 18:26.
+  await fill('ابصر به');
+  const absrLbls=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('ابصر به (plain alif) finds 18:26 (Каҳф 26)', absrLbls.length===1 && absrLbls.some(t=>/Каҳф · 26-оят/.test(t)));
+  await fill('ابصر'); ok('ابصر (plain alif) reaches أبصار/والأبصار hamza forms (>40)', (await hits())>40);
+  // ...but the tolerance is gated to leading-alif queries: a bare key like بصر (no
+  // leading alif typed) is NOT broadened, so it keeps its precise word-start hits.
+  await fill('بصر'); ok('بصر (no leading alif) stays precise (<20, not broadened)', (await hits())<20);
 
   console.log('=== 5g. PERSIAN/URDU KEYBOARD VARIANTS ===');
   // Farsi/Urdu mobile keyboards emit Farsi yeh ی (U+06CC) for ي, keheh ک (U+06A9)

@@ -441,7 +441,16 @@ function hasAl(q){return /(^|[^\u0621-\u064A\u0671])[\u0627\u0622\u0623\u0625\u0
 // dropped, leaving the \u0644). Mirrors the Uzbek word-start search: \u062D\u064A\u0629 matches the
 // word \u062D\u064E\u064A\u064E\u0651\u0629 but not the tail of \u062A\u064E\u062D\u0650\u064A\u064E\u0651\u0629. Hamza (\u0623 \u0625 \u0622 \u0621) is kept, so \u0623\u0639\u0644\u0649
 // ('highest', key \u0621\u0639\u0644) no longer collapses to \u0639\u0644 and over-match \u0639\u0644\u0649.
-function arWbRe(key){if(!key)return null;try{return new RegExp('(?:^| )[\u0648\u0641\u0628\u0643\u0644]*'+key);}catch(e){return null;}}
+// optHamza (set when the query word began with a plain alif the user typed, which
+// normAr dropped) tolerates an optional word-initial \u0621 in the verse: most alif-
+// initial Quran words are hamzat-al-qat' written with hamza (key \u0621\u0628\u0635\u0631 for \u0623\u0628\u0635\u0631),
+// so typing the bare alif (\u0627\u0628\u0635\u0631 \u2192 key \u0628\u0635\u0631) must still reach them \u2014 e.g. \u0627\u0628\u0635\u0631 \u0628\u0647
+// \u2192 18:26. Purely additive: a leading-alif query already drops its alif, so the
+// bare-key hits (incl. \u0639\u0644\u0649 for \u0627\u0639\u0644\u0649) are unchanged; this only adds the hamza forms.
+function arWbRe(key,optHamza){if(!key)return null;try{return new RegExp('(?:^| )[\u0648\u0641\u0628\u0643\u0644]*'+(optHamza?'\u0621?':'')+key);}catch(e){return null;}}
+// True when the query's first significant letter (after Farsi/Urdu folding and
+// stripping diacritics) is a plain alif \u0627 or wasla \u0671 \u2014 the chars normAr drops.
+function arLeadAlif(q){var s=arKbd(q||'').replace(/[\u0610-\u061A\u064B-\u0653\u0656-\u065F\u06D6-\u06ED\u0640\u0670]/g,'');for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c===0x20)continue;return c===0x627||c===0x671;}return false;}
 // Derive a search "stem" from a loose Arabic key (output of normAr) so a user who
 // types the full conjugated word they SEE (\u062a\u0646\u062d\u062a\u0648\u0646 / \u064a\u0646\u062d\u062a\u0648\u0646) gets the same
 // root-search offer as one who types the bare root \u0646\u062d\u062a. Peels one leading
@@ -927,7 +936,7 @@ function renderVerseHits(q){
   if(hitMode)hitExit();
   if(!q||q.length<2){box.innerHTML='';return;}
   var ql=q.toLowerCase(),qll=ql.replace(/['\u2018\u2019\u02bb]/g,''),qa=normAr(q),qan=arStrip?normArNoAl(q):'',vr=[];
-  var qaWb=arWbRe(qa),qanWb=arStrip?arWbRe(qan):null,qStem=arStem(qa);
+  var qLeadA=arLeadAlif(q);var qaWb=arWbRe(qa,qLeadA),qanWb=arStrip?arWbRe(qan,qLeadA):null,qStem=arStem(qa);
   var reNoAl=(arStrip&&hasVowel(q))?arRe(q.replace(/(^|\s)[\u0627\u0622\u0623\u0625\u0671]\u0644/g,'$1')):null;
   if(reNoAl){var anyN=false;for(var i=0;i<QD.length&&!anyN;i++){var svN=QD[i].verses;for(var j=0;j<svN.length;j++){if(svN[j]._als&&reNoAl.test(svN[j]._als)){anyN=true;break;}}}if(!anyN)reNoAl=null;}
   var re=(!arStrip&&hasVowel(q))?arRe(q):null;
