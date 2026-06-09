@@ -577,7 +577,7 @@ function arDropStart(q){for(var i=0;i<(q||'').length;i++){var c=q.charCodeAt(i);
 // loose consonant skeleton — same folding the search uses — then maps the
 // matched skeleton run back to the raw span (including any in-between harakat)
 // and wraps it in <mark>. Best-effort & vowel-insensitive; never breaks layout.
-function hlAr(t,q,max){
+function hlAr(t,q,max,whole){
   if(!t)return '';
   var qsk=q?arSkel(q):'';
   var sk='',ps=[],pe=[];
@@ -597,6 +597,10 @@ function hlAr(t,q,max){
     // and spaces so it never bleeds into an adjacent word.
     if(dE)while(b+1<t.length){var cc=t.charCodeAt(b+1);if(arMark(cc)||arDropBase(cc))b++;else break;}
     if(dS)while(a>0&&arDropBase(t.charCodeAt(a-1))){a--;while(a>0&&arMark(t.charCodeAt(a-1)))a--;}
+    // Root search highlights a stem buried mid-word (نحت inside يَنْحِتُونَ); marking
+    // only those middle letters splits the cursive word and makes it hard to read,
+    // so widen the span to the whole word (out to the surrounding spaces / edges).
+    if(whole){while(a>0&&t.charCodeAt(a-1)!==0x20)a--;while(b+1<t.length&&t.charCodeAt(b+1)!==0x20)b++;}
     marks.push([a,b]);from=idx+qsk.length;}}
   // Window long Arabic around the first match so a hit past the card cut stays
   // visible (no max => whole verse, e.g. the sūra page).
@@ -879,7 +883,7 @@ function openSura(num,hw,scrollVerse){
     var lbl=esc(v.label);
     vH+='<div class="verse'+(hilit?' highlighted':'')+'" id="v-'+lbl+'" data-lbl="'+lbl+'">';
     vH+='<button class="verse-num" type="button" data-num="'+num+'" data-lbl="'+lbl+'" onclick="App.cp('+num+',\''+lbl+'\')" aria-label="Нусха олиш ёки узун босиш билан танлаш" title="Нусха олиш — узун босиш билан кўплаб танлаш"><span>'+lbl+'</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>';
-    if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+hlAr(v.ar,hw)+'</div>';
+    if(v.ar)vH+='<div class="verse-ar" dir="rtl" lang="ar" style="font-size:'+arFz(fz)+'px">'+hlAr(v.ar,hw,0,true)+'</div>';
     vH+='<div class="verse-text" style="font-size:'+fz+'px">'+hl(p.m,hw)+'</div>';
     if(p.iz){
       vH+='<span class="izoh-toggle" onclick="App.iz(this)">▼ Изоҳни кўриш</span>';
@@ -971,7 +975,7 @@ function renderVerseHits(q){
     h+='<div class="result-item" data-n="'+r.s.number+'" data-lbl="'+esc(r.v.label)+'" onclick="App.hitTap(event,'+r.s.number+',\''+esc(r.v.label)+'\',\''+esc(q)+'\')">';
     h+='<div class="result-head"><div class="result-label">'+r.s.number+'. '+esc(r.s.name)+' · '+esc(r.v.label)+'-оят</div>';
     h+='<button type="button" class="result-copy" onclick="App.cpHit(event,'+r.s.number+',\''+esc(r.v.label)+'\')" aria-label="Оятни нусхалаш" title="Нусхалаш"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></div>';
-    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar,arRoot?qStem:q,260)+'</div>';
+    if(r.ma&&r.v.ar)h+='<div class="result-text-ar" dir="rtl" lang="ar">'+hlAr(r.v.ar,arRoot?qStem:q,260,arRoot)+'</div>';
     var sn=snip(src,q,260);
     h+='<div class="result-text">'+(sn.pre?'… ':'')+hl(sn.s,q)+(sn.post?' …':'')+'</div></div>';
   }
