@@ -167,6 +167,18 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('هذا'); ok('هذا matches dagger-alif هَٰذَا (>100)', (await total())>100);
   await fill('مؤمن'); ok('مؤمن (waw-hamza) still matches (>100)', (await total())>100);
 
+  console.log('=== 5g. PERSIAN/URDU KEYBOARD VARIANTS ===');
+  // Farsi/Urdu mobile keyboards emit Farsi yeh ی (U+06CC) for ي, keheh ک (U+06A9)
+  // for ك, etc. arKbd folds them so a query typed on such a layout still matches
+  // the Uthmani text — otherwise the final [^ء-ي] filter drops them (عقیم→عقم, 0 hits).
+  await fill('عقيم'); const aqimAr=await hits();
+  await fill('عقیم'); // same word, Farsi yeh U+06CC
+  const aqimFa=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('Farsi-yeh عقیم matches Arabic-yeh عقيم (same hit count)', aqimAr>0 && aqimFa.length===aqimAr);
+  ok('Farsi-yeh عقیم finds the article case (Ваз-Зориёт 41)', aqimFa.some(t=>/Ваз-Зориёт · 41-оят/.test(t)));
+  await fill('کتاب'); // كتاب with keheh U+06A9
+  ok('Keheh کتاب folds to ك and matches (>100)', (await total())>100);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
