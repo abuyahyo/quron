@@ -98,7 +98,22 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('الله');
   const arCov=await pg.$$eval('#verseHits .result-text-ar',els=>els.filter(e=>e.querySelectorAll('mark').length===0).length);
   ok('every الله result highlights (windowed)', arCov===0);
+  // A plain-alif query matching a hamza-initial word must highlight the WHOLE
+  // written word, leading hamza included (the start-reclaim skips the harakat that
+  // sits between the hamza and the next consonant in voweled text). Otherwise the
+  // gold mark would start at بۡصِر and leave أَ bare, splitting the cursive word.
+  await fill('ابصر به');
+  // The verse stores أ decomposed (alif U+0627 + combining hamza U+0654), so the
+  // reclaimed mark begins with the alif, not the precomposed أ — assert the first
+  // base is an alif/hamza, i.e. NOT the bare ب the un-reclaimed span would start on.
+  const absrMark=await pg.$eval('#verseHits .result-text-ar mark',m=>m.textContent.trim());
+  ok('ابصر به highlight includes the leading hamza (whole word)', [0x0627,0x0623,0x0622,0x0625,0x0621].indexOf(absrMark.charCodeAt(0))>=0);
+  // ...but a bare query (no leading alif typed) must NOT swallow a preceding hamza.
+  await fill('بصر');
+  const bsrMark=await pg.$eval('#verseHits .result-text-ar mark',m=>m.textContent.trim());
+  ok('بصر highlight does not grab a leading hamza', bsrMark.charAt(0)==='ب');
   // opening an arabic hit highlights the word on the detail page too
+  await fill('سماعون للكذب');
   await pg.click('#verseHits .result-item'); await pg.waitForTimeout(500);
   ok('detail verse-ar highlighted', (await pg.$$eval('#suraPage .verse-ar mark',e=>e.length))>=1);
   await pg.evaluate(()=>App.goHome());await pg.waitForTimeout(200);

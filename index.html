@@ -605,7 +605,12 @@ function hlAr(t,q,max,whole){
     // so a bare consonant query can't swallow a stray alif; stops at real letters
     // and spaces so it never bleeds into an adjacent word.
     if(dE)while(b+1<t.length){var cc=t.charCodeAt(b+1);if(arMark(cc)||arDropBase(cc))b++;else break;}
-    if(dS)while(a>0&&arDropBase(t.charCodeAt(a-1))){a--;while(a>0&&arMark(t.charCodeAt(a-1)))a--;}
+    // Peek past any harakat sitting between the match and the preceding base: in
+    // voweled text a word-initial alif/hamza carries a vowel (أَبۡصِر), so a naive
+    // "is the char just before the match a dropped alif?" check stops on that vowel
+    // and leaves the leading أَ unmarked. Mirror the end-reclaim: skip marks, and if
+    // the base behind them is a dropped alif/hamza, swallow it (and repeat).
+    if(dS)while(a>0){var ma=a;while(ma>0&&arMark(t.charCodeAt(ma-1)))ma--;if(ma>0&&arDropBase(t.charCodeAt(ma-1)))a=ma-1;else break;}
     // Root search highlights a stem buried mid-word (نحت inside يَنْحِتُونَ); marking
     // only those middle letters splits the cursive word and makes it hard to read,
     // so widen the span to the whole word (out to the surrounding spaces / edges).
