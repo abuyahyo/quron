@@ -179,6 +179,24 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   await fill('کتاب'); // كتاب with keheh U+06A9
   ok('Keheh کتاب folds to ك and matches (>100)', (await total())>100);
 
+  console.log('=== 5h. ROOT SEARCH (نحت → all conjugations) ===');
+  // A verb/noun root buried behind a conjugation prefix (ينحتون / تنحتون, root نحت) is
+  // missed by the word-start search; an opt-in "Ўзак бўйича қидириш" button runs an
+  // unanchored substring match that surfaces every form.
+  const rootBtnN=()=>pg.$$eval('#verseHits .ar-sug',es=>es.filter(e=>(e.getAttribute('onclick')||'').indexOf('arRoot')>=0).length);
+  await fill('نحت');
+  ok('bare root نحت → 0 default (word-start) hits', (await hits())===0);
+  ok('bare root نحت → root button offered', (await rootBtnN())===1);
+  await pg.click('#verseHits [onclick*="arRoot"]'); await pg.waitForTimeout(300);
+  const rootLbls=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+  ok('root نحت click → 4 verses (all carving forms)', (await hits())===4);
+  ok('root نحت covers Аъроф/Ҳижр/Шуъаро/Соффот',
+     ['Аъроф · 74','Ҳижр · 82-83','Шуъаро · 149','Соффот · 94-95-96'].every(s=>rootLbls.some(l=>l.indexOf(s)>=0)));
+  ok('root click clears stale "nothing found"', (await pg.$$eval('.no-results',e=>e.length))===0);
+  await fill('تنحتون');
+  ok('full form تنحتون → 3 word-start hits (unchanged)', (await hits())===3);
+  ok('full form تنحتون → no root button (substring adds nothing)', (await rootBtnN())===0);
+
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
   await fill('المصصصص'); ok('article sug hidden for gibberish', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))===0);
