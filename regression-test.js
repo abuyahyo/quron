@@ -193,9 +193,19 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
   ok('root نحت covers Аъроф/Ҳижр/Шуъаро/Соффот',
      ['Аъроф · 74','Ҳижр · 82-83','Шуъаро · 149','Соффот · 94-95-96'].every(s=>rootLbls.some(l=>l.indexOf(s)>=0)));
   ok('root click clears stale "nothing found"', (await pg.$$eval('.no-results',e=>e.length))===0);
+  // Typing the full conjugated word the user actually SEES offers the same root
+  // search — the stem peels the prefix/suffix (تنحتون / ينحتون → نحت).
+  const carving=['Аъроф · 74','Ҳижр · 82-83','Шуъаро · 149','Соффот · 94-95-96'];
+  for(const form of ['تنحتون','ينحتون']){
+    await fill(form);
+    ok('full form '+form+' → root button offered', (await rootBtnN())===1);
+    await pg.click('#verseHits [onclick*="arRoot"]'); await pg.waitForTimeout(300);
+    const lbls=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
+    ok('full form '+form+' root click → 4 carving verses',
+       (await hits())===4 && carving.every(s=>lbls.some(l=>l.indexOf(s)>=0)));
+  }
   await fill('تنحتون');
-  ok('full form تنحتون → 3 word-start hits (unchanged)', (await hits())===3);
-  ok('full form تنحتون → no root button (substring adds nothing)', (await rootBtnN())===0);
+  ok('full form تنحتون → default search still 3 word-start hits (unchanged)', (await hits())===3);
 
   console.log('=== 6. ARTICLE SUGGESTION ===');
   await fill('المقام'); ok('article sug shows for real word', (await pg.$$eval('#verseHits .ar-sug',e=>e.length))>=1);
