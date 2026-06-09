@@ -203,6 +203,11 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
     const lbls=await pg.$$eval('#verseHits .result-label',e=>e.map(x=>x.textContent));
     ok('full form '+form+' root click → 4 carving verses',
        (await hits())===4 && carving.every(s=>lbls.some(l=>l.indexOf(s)>=0)));
+    // Root highlight must cover the WHOLE word, not just the mid-word stem نحت —
+    // a stem-only mark would break the cursive script. Every carving form ends ون.
+    const rMarks=await pg.$$eval('#verseHits .result-text-ar mark',e=>e.map(m=>m.textContent.replace(/[ً-ْٰۖ-ۭ]/g,'')));
+    ok('root highlight covers the whole word (ends ون, not bare نحت)',
+       rMarks.length>=4 && rMarks.every(s=>/ون$/.test(s)));
   }
   await fill('تنحتون');
   ok('full form تنحتون → default search still 3 word-start hits (unchanged)', (await hits())===3);
